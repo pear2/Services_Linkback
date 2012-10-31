@@ -3,13 +3,58 @@ namespace PEAR2\Services\Pingback2;
 
 class Client
 {
+    /**
+     * HTTP request object that's used to do the requests
+     * @var \HTTP_Request2
+     */
     protected $request;
 
+    /**
+     * (debug) message that we get on a successful pingback request
+     * @var string
+     */
+    protected $message;
+
+    /**
+     * Fault code that gets set when pingback fails
+     * @var integer
+     */
+    protected $faultCode;
+
+    /**
+     * Fault error message that gets set when pingback fails
+     * @var string
+     */
+    protected $faultString;
+
+
+    /**
+     * Initializes the HTTP request object
+     */
     public function __construct()
     {
         $this->setRequest(new \HTTP_Request2());
     }
 
+    /**
+     * Send a pingback, indicating a link from source to target.
+     * The target's pingback server will be discovered automatically.
+     *
+     * @param string $sourceUri URL on this side, it links to $targetUri
+     * @param string $targetUri Remote URL that shall be notified about source
+     *
+     * @return boolean True when all went well, false if there was an error
+     *                 Use getFaultCode() and getFaultString() to find out about
+     *                 the errors, getMessage() about the debug message in case
+     *                 all went well.
+     *
+     * FIXME: How to indicate discovery failure? Response object?
+     * FIXME: add reset() method to reset before each request
+     *
+     * @see getFaultString()
+     * @see getFaultCode()
+     * @see getMessage()
+     */
     public function send($sourceUri, $targetUri)
     {
         //FIXME: validate $sourceUri, $targetUri
@@ -25,6 +70,8 @@ class Client
 
     /**
      * Autodiscover the pingback server for the given URI.
+     *
+     * @param string $targetUri Some URL to discover the pingback server of
      *
      * @return string|boolean False when it failed, server URI on success
      */
@@ -69,6 +116,23 @@ class Client
         return $uri;
     }
 
+    /**
+     * Contacts the given pingback server and tells him that source links to
+     * target.
+     *
+     * @param string $serverUri URL of XML-RPC server that implements pingback
+     * @param string $sourceUri URL on this side, it links to $targetUri
+     * @param string $targetUri Remote URL that shall be notified about source
+     *
+     * @return boolean True when all went well, false if there was an error
+     *                 Use getFaultCode() and getFaultString() to find out about
+     *                 the errors, getMessage() about the debug message in case
+     *                 all went well.
+     *
+     * @see getFaultString()
+     * @see getFaultCode()
+     * @see getMessage()
+     */
     protected function sendPingback($serverUri, $sourceUri, $targetUri)
     {
         $encSourceUri = htmlspecialchars($sourceUri);
@@ -94,6 +158,17 @@ XML
         return $this->handleResponse($res);
     }
 
+    /**
+     * Handles a XML-RPC response and sets internal variables.
+     *
+     * @param object $res HTTP response object
+     *
+     * @return boolean True if all went well, false if not.
+     *
+     * @uses $faultCode
+     * @uses $faultString
+     * @uses $message
+     */
     protected function handleResponse(\HTTP_Request2_Response $res)
     {
         if (intval($res->getStatus() / 100) != 2) {
@@ -118,16 +193,59 @@ XML
 
     //FIXME: implement http://old.aquarionics.com/misc/archives/blogite/0198.html
 
-
-    protected function getRequest()
+    /**
+     * Returns the HTTP request object that's used internally
+     *
+     * @return \HTTP_Request2
+     */
+    public function getRequest()
     {
         return $this->request;
     }
 
-    protected function setRequest(\HTTP_Request2 $request)
+    /**
+     * Sets a custom HTTP request object that will be used to do HTTP requests
+     *
+     * @param \HTTP_Request2 $request Request object
+     *
+     * @return self
+     */
+    public function setRequest(\HTTP_Request2 $request)
     {
         $this->request = $request;
+        return $this;
     }
+
+    /**
+     * Returns the XML-RPC fault code
+     *
+     * @return integer Error code
+     */
+    public function getFaultCode()
+    {
+        return $this->faultCode;
+    }
+
+    /**
+     * Returns the XML-RPC fault message
+     *
+     * @return string Error message
+     */
+    public function getFaultString()
+    {
+        return $this->faultString;
+    }
+
+    /**
+     * Returns the XML-RPC debug message for a successful pingback
+     *
+     * @return string Message
+     */
+    public function getMessage()
+    {
+        return $this->message;
+    }
+
 }
 
 ?>

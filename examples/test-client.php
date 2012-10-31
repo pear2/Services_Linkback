@@ -8,8 +8,8 @@ $r = $c->send(
 );
 var_dump($r);
 if ($r === false) {
-    var_dump($c->faultCode, $c->faultString);
+    var_dump($c->getFaultCode(), $c->getFaultString());
 } else {
-    var_dump($c->message);
+    var_dump($c->getMessage());
 }
 ?>

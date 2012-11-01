@@ -9,24 +9,6 @@ class Client
      */
     protected $request;
 
-    /**
-     * (debug) message that we get on a successful pingback request
-     * @var string
-     */
-    protected $message;
-
-    /**
-     * Fault code that gets set when pingback fails
-     * @var integer
-     */
-    protected $faultCode;
-
-    /**
-     * Fault error message that gets set when pingback fails
-     * @var string
-     */
-    protected $faultString;
-
 
     /**
      * Initializes the HTTP request object
@@ -43,17 +25,8 @@ class Client
      * @param string $sourceUri URL on this side, it links to $targetUri
      * @param string $targetUri Remote URL that shall be notified about source
      *
-     * @return boolean True when all went well, false if there was an error
-     *                 Use getFaultCode() and getFaultString() to find out about
-     *                 the errors, getMessage() about the debug message in case
-     *                 all went well.
-     *
-     * FIXME: How to indicate discovery failure? Response object?
-     * FIXME: add reset() method to reset before each request
-     *
-     * @see getFaultString()
-     * @see getFaultCode()
-     * @see getMessage()
+     * @return Response_Ping Pingback response object containing all error
+     *                       and status information.
      */
     public function send($sourceUri, $targetUri)
     {
@@ -62,7 +35,10 @@ class Client
         $serverUri = $this->discoverServer($targetUri);
         if ($serverUri === false) {
             //target resource is not pingback endabled
-            return false;
+            return new Response_Ping(
+                'No pingback server found for URI',
+                Response_Ping::PINGBACK_UNSUPPORTED
+            );
         }
 
         return $this->sendPingback($serverUri, $sourceUri, $targetUri);
@@ -124,14 +100,8 @@ class Client
      * @param string $sourceUri URL on this side, it links to $targetUri
      * @param string $targetUri Remote URL that shall be notified about source
      *
-     * @return boolean True when all went well, false if there was an error
-     *                 Use getFaultCode() and getFaultString() to find out about
-     *                 the errors, getMessage() about the debug message in case
-     *                 all went well.
-     *
-     * @see getFaultString()
-     * @see getFaultCode()
-     * @see getMessage()
+     * @return Response_Ping Pingback response object containing all error
+     *                       and status information.
      */
     protected function sendPingback($serverUri, $sourceUri, $targetUri)
     {
@@ -155,40 +125,10 @@ class Client
 XML
             );
         $res = $req->send();
-        return $this->handleResponse($res);
-    }
 
-    /**
-     * Handles a XML-RPC response and sets internal variables.
-     *
-     * @param object $res HTTP response object
-     *
-     * @return boolean True if all went well, false if not.
-     *
-     * @uses $faultCode
-     * @uses $faultString
-     * @uses $message
-     */
-    protected function handleResponse(\HTTP_Request2_Response $res)
-    {
-        if (intval($res->getStatus() / 100) != 2) {
-            //no 2xx status code
-            return false;
-        }
-        $types = explode(';', $res->getHeader('content-type'));
-        if (count($types) < 1 || trim($types[0]) != 'text/xml') {
-            return false;
-        }
-
-        $rpc = xmlrpc_decode($res->getBody());
-        if ($rpc && !xmlrpc_is_fault($rpc)) {
-            $this->message = $rpc;
-            return true;
-        }
-
-        $this->faultCode   = $rpc['faultCode'];
-        $this->faultString = $rpc['faultString'];
-        return false;
+        $pres = new Response_Ping();
+        $pres->setResponse($res);
+        return $pres;
     }
 
     //FIXME: implement http://old.aquarionics.com/misc/archives/blogite/0198.html
@@ -214,36 +154,6 @@ XML
     {
         $this->request = $request;
         return $this;
-    }
-
-    /**
-     * Returns the XML-RPC fault code
-     *
-     * @return integer Error code
-     */
-    public function getFaultCode()
-    {
-        return $this->faultCode;
-    }
-
-    /**
-     * Returns the XML-RPC fault message
-     *
-     * @return string Error message
-     */
-    public function getFaultString()
-    {
-        return $this->faultString;
-    }
-
-    /**
-     * Returns the XML-RPC debug message for a successful pingback
-     *
-     * @return string Message
-     */
-    public function getMessage()
-    {
-        return $this->message;
     }
 
 }

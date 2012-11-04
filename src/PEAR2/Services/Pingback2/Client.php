@@ -9,6 +9,16 @@ class Client
      */
     protected $request;
 
+    /**
+     * Debug mode
+     * If activated, the response object will contain the HTTP Response
+     *
+     * @var boolean
+     */
+    protected $debug = false;
+
+    protected $debugResponse;
+
 
     /**
      * Initializes the HTTP request object
@@ -30,15 +40,19 @@ class Client
      */
     public function send($sourceUri, $targetUri)
     {
+        $this->debugResponse = null;
+
         //FIXME: validate $sourceUri, $targetUri
 
         $serverUri = $this->discoverServer($targetUri);
         if ($serverUri === false) {
             //target resource is not pingback endabled
-            return new Response_Ping(
+            $rp = new Response_Ping(
                 'No pingback server found for URI',
-                Response_Ping::PINGBACK_UNSUPPORTED
+                States::PINGBACK_UNSUPPORTED
             );
+            $rp->setResponse($this->debugResponse);
+            return $rp;
         }
 
         return $this->sendPingback($serverUri, $sourceUri, $targetUri);
@@ -68,6 +82,9 @@ class Client
         //HEAD failed, do a normal GET
         $req->setMethod(\HTTP_Request2::METHOD_GET);
         $res = $req->send();
+        if ($this->debug) {
+            $this->debugResponse = $res;
+        }
 
         //yes, maybe the server does return this header now
         $headerUri = $res->getHeader('X-Pingback');
@@ -127,11 +144,17 @@ XML
         $res = $req->send();
 
         $pres = new Response_Ping();
-        $pres->setResponse($res);
+        $pres->setPingbackResponse($res, $this->debug);
         return $pres;
     }
 
     //FIXME: implement http://old.aquarionics.com/misc/archives/blogite/0198.html
+
+
+    public function setDebug($debug)
+    {
+        $this->debug = $debug;
+    }
 
     /**
      * Returns the HTTP request object that's used internally

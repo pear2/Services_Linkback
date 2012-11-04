@@ -78,7 +78,7 @@ class Client
 
         $body = $res->getBody();
         $regex = '#<link rel="pingback" href="([^"]+)" ?/?>#';
-        if (preg_match($regex, $body, $matches) === false) {
+        if (preg_match($regex, $body, $matches) == 0) {
             return false;
         }
 

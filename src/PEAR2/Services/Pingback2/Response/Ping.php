@@ -95,4 +95,3 @@ class Response_Ping
 }
 
 ?>
-

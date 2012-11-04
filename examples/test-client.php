@@ -8,8 +8,11 @@ $r = $c->send(
     'http://pingbacktest.wordpress.com/2008/01/15/hello-world/'
 );
 if ($r->isError()) {
-    var_dump($r->getCode(), $r->getMessage());
+    echo "Error:\n";
+    echo " Error code: " . $r->getCode() . "\n";
+    echo " Error message: " . $r->getMessage() . "\n";
 } else {
-    var_dump($r->getMessage());
+    echo "All fine\n";
+    echo " Debug message: " . $r->getMessage() . "\n";
 }
 ?>

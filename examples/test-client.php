@@ -5,7 +5,7 @@ function __autoload($class) {
 }
 
 $c = new \PEAR2\Services\Pingback2\Client();
-//$c->setDebug(true);
+$c->setDebug(true);
 $r = $c->send(
     'http://p.cweiske.de/18?foob',
     'http://test.bogo/remote-headeronly.php',
@@ -21,4 +21,5 @@ if ($r->isError()) {
     echo "All fine\n";
     echo " Debug message: " . $r->getMessage() . "\n";
 }
+echo html_entity_decode($r->getResponse()->getBody());
 ?>

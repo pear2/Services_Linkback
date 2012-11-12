@@ -37,6 +37,27 @@ class States
      * Defined by the pingback specification.
      */
     const TARGET_URI_NOT_FOUND = 32;
+
+    /**
+     * The pingback has already been registered.
+     * Defined by the pingback specification.
+     */
+    const ALREADY_REGISTERED = 48;
+
+    /**
+     * Access denied.
+     * Defined by the pingback specification.
+     */
+    const ACCESS_DENIED = 49;
+
+    /**
+     * The server could not communicate with an upstream server,
+     * or received an error from an upstream server, and therefore
+     * could not complete the request.
+     * This is similar to HTTP's 402 Bad Gateway error.
+     * Defined by the pingback specification.
+     */
+    const UPSTREAM_ERROR = 50;
 }
 
 ?>

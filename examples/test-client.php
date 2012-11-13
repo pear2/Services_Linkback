@@ -18,10 +18,9 @@ if ($r->isError()) {
     echo "Error:\n";
     echo " Error code: " . $r->getCode() . "\n";
     echo " Error message: " . $r->getMessage() . "\n";
-    //echo "Response object:\n";
-    //var_dump($r->getResponse());
 } else {
     echo "All fine\n";
     echo " Debug message: " . $r->getMessage() . "\n";
 }
+//var_dump($r->getResponse()->getBody());
 ?>

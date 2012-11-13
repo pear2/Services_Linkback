@@ -14,15 +14,30 @@ class Server
     public function run()
     {
         $post = file_get_contents('php://input');
+
+        $xs = xmlrpc_server_create();
+        xmlrpc_server_register_method(
+            $xs, 'pingback.ping', array($this, 'handlePingbackPing')
+        );
+        $out = xmlrpc_server_call_method($xs, $post, null);
+
+        $this->sendResponse($out);
+        return;
+        //FIXME
         $method = null;
         $params = xmlrpc_decode_request($post, $method);
+        $res = null;
 
         if ($method == 'pingback.ping') {
             $res = $this->handlePingbackPing($method, $params);
+        } else {
+            $res = array(
+                'faultCode' => States::METHOD_UNSUPPORTED,
+                'faultString' => 'Unknown xml-rpc method ' . $method
+            );
         }
-        var_dump($res);
-        //FIXME
-        $this->sendResponse();
+
+        $this->sendResponse($res);
     }
 
     /**
@@ -64,15 +79,15 @@ class Server
                 );
             }
 
-            if (!$this->verifyLinkExists($target, $res->getBody(), $res)) {
+            if (!$this->verifyLinkExists($target, $source, $res->getBody(), $res)) {
                 return array(
                     'faultCode'   => States::NO_LINK_IN_SOURCE,
                     'faultString' => 'The source URI does not contain a link to the'
-                    . 'target URI, and so cannot be used as a source.'
+                    . ' target URI, and so cannot be used as a source.'
                 );
             }
 
-            $this->storePingback($target, $source, $res);
+            $this->storePingback($target, $source, $res->getBody(), $res);
         } catch (Exception $e) {
             return array(
                 'faultCode'   => $e->getCode(),
@@ -80,13 +95,13 @@ class Server
             );
         }
 
-        //FIXME: send positive response
+        return array('Pingback received and processed');
     }
 
-    protected function sendResponse()
+    protected function sendResponse($xml)
     {
         header('Content-type: text/xml; charset=utf-8');
-        //FIXME
+        echo $xml;
     }
 
     /**

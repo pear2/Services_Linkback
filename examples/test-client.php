@@ -7,19 +7,20 @@ function __autoload($class) {
 $c = new \PEAR2\Services\Pingback2\Client();
 $c->setDebug(true);
 $r = $c->send(
-    'http://p.cweiske.de/18?foob',
-    'http://test.bogo/remote-headeronly.php',
-    'http://pingbacktest.wordpress.com/2008/01/15/hello-world/'
+    //'http://p.cweiske.de/18?foob',
+    'http://test.bogo/page-with-link.htm',
+    'http://test.bogo/remote-headeronly.php'
+    //'http://pingbacktest.wordpress.com/2008/01/15/hello-world/'
 );
+
 if ($r->isError()) {
     echo "Error:\n";
     echo " Error code: " . $r->getCode() . "\n";
     echo " Error message: " . $r->getMessage() . "\n";
-    echo "Response object:\n";
-    var_dump($r->getResponse());
+    //echo "Response object:\n";
+    //var_dump($r->getResponse());
 } else {
     echo "All fine\n";
     echo " Debug message: " . $r->getMessage() . "\n";
 }
-echo html_entity_decode($r->getResponse()->getBody());
 ?>

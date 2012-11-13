@@ -17,14 +17,15 @@ class Server_Callback_LinkExists
     public function verifyLinkExists(
         $target, $source, $sourceBody, \HTTP_Request2_Response $res
     ) {
-        $doc = new DOMDocument();
+        $doc = new \DOMDocument();
         $doc->loadHTML($sourceBody);
-        $xpath = new DOMXPath($doc);
+        $xpath = new \DOMXPath($doc);
 
         $targetNoQuotes = str_replace('"', '', $target);
         $nodeList = $xpath->query(
             '//a[@href="' . $target . '"'
-            . ' or contains(@href, "' . $targetNoQuotes . '#"]'
+            . ' or contains(@href, "' . $targetNoQuotes . '#")'
+            . ']'
         );
 
         return $nodeList->length > 0;

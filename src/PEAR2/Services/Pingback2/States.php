@@ -18,7 +18,17 @@ class States
      */
     const PINGBACK_UNSUPPORTED = 200;
 
-    const PARAMETER_MISSING = -32000;
+    /**
+     * The XML-RPC call had too few parameters and could not be processed.
+     * Defined by "Specification for Fault Code Interoperability".
+     */
+    const PARAMETER_MISSING = -32602;
+
+    /**
+     * The XML-RPC method is not supported and cannot be handled.
+     * Defined by "Specification for Fault Code Interoperability".
+     */
+    const METHOD_UNSUPPORTED = -32601;
 
     /**
      * The source URI could not be retrieved.

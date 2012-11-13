@@ -66,15 +66,15 @@ class Response_Ping
             return;
         }
 
-        $rpc = xmlrpc_decode($res->getBody());
-        if ($rpc && !xmlrpc_is_fault($rpc)) {
+        $params = xmlrpc_decode($res->getBody());
+        if ($params && !xmlrpc_is_fault($params)) {
             $this->code    = null;
-            $this->message = $rpc;
+            $this->message = $params[0];
             return;
         }
 
-        $this->code    = $rpc['faultCode'];
-        $this->message = $rpc['faultString'];
+        $this->code    = $params['faultCode'];
+        $this->message = $params['faultString'];
     }
 
     /**

@@ -65,9 +65,12 @@ class Response_Ping
             $this->message = 'HTTP content type is not text/xml';
             return;
         }
-
         $params = xmlrpc_decode($res->getBody());
-        if ($params && !xmlrpc_is_fault($params)) {
+        if ($params === null) {
+            $this->code    = States::MESSAGE_INVALID;
+            $this->message = 'Pingback response is invalid';
+            return;
+        } else if ($params && !xmlrpc_is_fault($params)) {
             $this->code    = null;
             $this->message = $params[0];
             return;

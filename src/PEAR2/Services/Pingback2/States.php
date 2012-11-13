@@ -31,6 +31,12 @@ class States
     const METHOD_UNSUPPORTED = -32601;
 
     /**
+     * The message is not a valid XML-RPC message.
+     * Defined by "Specification for Fault Code Interoperability".
+     */
+    const MESSAGE_INVALID = -32600;
+
+    /**
      * The source URI could not be retrieved.
      * Defined by the pingback specification.
      */

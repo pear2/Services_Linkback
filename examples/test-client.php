@@ -9,7 +9,8 @@ $c->setDebug(true);
 $r = $c->send(
     //'http://p.cweiske.de/18?foob',
     'http://test.bogo/page-with-link.htm',
-    'http://test.bogo/remote-headeronly.php'
+    //'http://test.bogo/remote-headeronly.php'
+    'http://test.bogo/remote-headlinkonly.php'
     //'http://pingbacktest.wordpress.com/2008/01/15/hello-world/'
 );
 

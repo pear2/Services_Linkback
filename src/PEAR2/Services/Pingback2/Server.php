@@ -72,7 +72,7 @@ class Server
             }
 
             $this->storePingback($target, $source, $res->getBody(), $res);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array(
                 'faultCode'   => $e->getCode(),
                 'faultString' => $e->getMessage()

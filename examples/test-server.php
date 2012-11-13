@@ -10,9 +10,16 @@ class PingbackLogger
     public function storePingback(
         $target, $source, $sourceBody, \HTTP_Request2_Response $res
     ) {
+        $logfile = __DIR__ . '/test-server-pingback.log';
+        if (!is_writable($logfile)) {
+            throw new Exception(
+                'Log file is not writable: ' . $logfile,
+                12345
+            );
+        }
         file_put_contents(
-            __DIR__ . '/test-server-pingback.log',
-            'Pingback for ' . $target . ' from ' . $source . "\n",
+            $logfile,
+            '[' . date('c') . '] pingback for ' . $target . ' from ' . $source . "\n",
             \FILE_APPEND
         );
     }

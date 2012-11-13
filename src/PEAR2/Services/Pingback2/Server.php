@@ -22,22 +22,6 @@ class Server
         $out = xmlrpc_server_call_method($xs, $post, null);
 
         $this->sendResponse($out);
-        return;
-        //FIXME
-        $method = null;
-        $params = xmlrpc_decode_request($post, $method);
-        $res = null;
-
-        if ($method == 'pingback.ping') {
-            $res = $this->handlePingbackPing($method, $params);
-        } else {
-            $res = array(
-                'faultCode' => States::METHOD_UNSUPPORTED,
-                'faultString' => 'Unknown xml-rpc method ' . $method
-            );
-        }
-
-        $this->sendResponse($res);
     }
 
     /**

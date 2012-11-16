@@ -1,6 +1,27 @@
 <?php
+/**
+ * This file is part of the PEAR2\Services\Pingback2 package.
+ *
+ * PHP version 5
+ *
+ * @category Services
+ * @package  PEAR2\Services\Pingback2
+ * @author   Christian Weiske <cweiske@php.net>
+ * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link     http://pear2.php.net/package/Services_Pingback2
+ */
 namespace PEAR2\Services\Pingback2;
 
+/**
+ * Pingback client, allowing you to send pingbacks to remote sites
+ * to tell them that you linked to them.
+ *
+ * @category Services
+ * @package  PEAR2\Services\Pingback2
+ * @author   Christian Weiske <cweiske@php.net>
+ * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link     http://pear2.php.net/package/Services_Pingback2
+ */
 class Client
 {
     /**
@@ -17,6 +38,13 @@ class Client
      */
     protected $debug = false;
 
+    /**
+     * Full response of the pingback request, helpful for debugging
+     * in some error conditions.
+     * Gets set when $debug is enabled
+     *
+     * @var \HTTP_Request2_Response
+     */
     protected $debugResponse;
 
 
@@ -150,7 +178,13 @@ XML
 
     //FIXME: implement http://old.aquarionics.com/misc/archives/blogite/0198.html
 
-
+    /**
+     * Enable debugging by collecting HTTP response objects.
+     *
+     * @param boolean $debug True to enable debugging, false to deactivate it.
+     *
+     * @return void
+     */
     public function setDebug($debug)
     {
         $this->debug = $debug;

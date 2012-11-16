@@ -1,0 +1,3 @@
+<?php
+$host = 'http://test.bogo';
+?>

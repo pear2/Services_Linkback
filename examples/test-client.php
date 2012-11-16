@@ -1,4 +1,5 @@
 <?php
+include __DIR__ . '/config.php';
 set_include_path(get_include_path() . PATH_SEPARATOR . __DIR__ . '/../src/');
 function __autoload($class) {
     include_once str_replace(array('_', '\\'), '/', $class) . '.php';
@@ -8,9 +9,9 @@ $c = new \PEAR2\Services\Pingback2\Client();
 $c->setDebug(true);
 $r = $c->send(
     //'http://p.cweiske.de/18?foob',
-    'http://test.bogo/page-with-link.htm',
-    //'http://test.bogo/remote-headeronly.php'
-    'http://test.bogo/remote-headlinkonly.php'
+    $host . '/page-with-link.php',
+    //$host . '/remote-headeronly.php'
+    $host . '/remote-headlinkonly.php'
     //'http://pingbacktest.wordpress.com/2008/01/15/hello-world/'
 );
 

@@ -1,6 +1,9 @@
 <?php
 namespace PEAR2\Services\Pingback2;
 
+/**
+ * @fixme Add source context fetch code for easier integration
+ */
 class Server
 {
     protected $callbacks = array();

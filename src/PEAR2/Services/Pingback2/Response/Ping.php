@@ -1,8 +1,25 @@
 <?php
+/**
+ * This file is part of the PEAR2\Services\Pingback2 package.
+ *
+ * PHP version 5
+ *
+ * @category Services
+ * @package  PEAR2\Services\Pingback2
+ * @author   Christian Weiske <cweiske@php.net>
+ * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link     http://pear2.php.net/package/Services_Pingback2
+ */
 namespace PEAR2\Services\Pingback2;
 
 /**
- * Response to a client ping() request
+ * Response to a client ping() request.
+ *
+ * @category Services
+ * @package  PEAR2\Services\Pingback2
+ * @author   Christian Weiske <cweiske@php.net>
+ * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link     http://pear2.php.net/package/Services_Pingback2
  */
 class Response_Ping
 {
@@ -30,7 +47,12 @@ class Response_Ping
     protected $response;
 
 
-
+    /**
+     * Create new instance and set class variables.
+     *
+     * @param string  $message Response message
+     * @param integer $code    Error/status code. NULL for no error.
+     */
     public function __construct($message = null, $code = null)
     {
         $this->message = $message;
@@ -128,7 +150,7 @@ class Response_Ping
     /**
      * Sets the HTTP response object
      *
-     * @param \HTTP_Request2_Response Response object
+     * @param \HTTP_Request2_Response $res Response object
      *
      * @return void
      */

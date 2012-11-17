@@ -1,6 +1,28 @@
 <?php
+/**
+ * This file is part of the PEAR2\Services\Pingback2 package.
+ *
+ * PHP version 5
+ *
+ * @category Services
+ * @package  PEAR2\Services\Pingback2
+ * @author   Christian Weiske <cweiske@php.net>
+ * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link     http://pear2.php.net/package/Services_Pingback2
+ */
 namespace \PEAR2\Services\Pingback2;
 
+/**
+ * Default implementation of the LinkExists interface.
+ *
+ * You may use it in your pingback server code.
+ *
+ * @category Services
+ * @package  PEAR2\Services\Pingback2
+ * @author   Christian Weiske <cweiske@php.net>
+ * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link     http://pear2.php.net/package/Services_Pingback2
+ */
 class Server_Callback_LinkExists
     implements Server_Callback_ILinkExists
 {

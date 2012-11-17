@@ -1,19 +1,59 @@
 <?php
+/**
+ * This file is part of the PEAR2\Services\Pingback2 package.
+ *
+ * PHP version 5
+ *
+ * @category Services
+ * @package  PEAR2\Services\Pingback2
+ * @author   Christian Weiske <cweiske@php.net>
+ * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link     http://pear2.php.net/package/Services_Pingback2
+ */
 namespace PEAR2\Services\Pingback2;
 
 /**
+ * Pingback server implementation.
+ * The important behavior is controlled by callbacks that may be registered
+ * with addCallback() or setCallbacks():
+ * - verify that the target exists
+ * - fetch source
+ * - verify that source links to target
+ * - store pingback
+ *
+ * After adding your callbacks, simply call run().
+ *
  * @fixme Add source context fetch code for easier integration
+ *
+ * @category Services
+ * @package  PEAR2\Services\Pingback2
+ * @author   Christian Weiske <cweiske@php.net>
+ * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link     http://pear2.php.net/package/Services_Pingback2
  */
 class Server
 {
+    /**
+     * Registered callbacks of all types.
+     *
+     * @var array
+     */
     protected $callbacks = array();
 
+    /**
+     * Registers default callbacks
+     */
     public function __construct()
     {
         $this->addCallback(new Server_Callback_FetchSource());
         $this->addCallback(new Server_Callback_LinkExists());
     }
 
+    /**
+     * Run the pingback server and respond to the request.
+     *
+     * @return void
+     */
     public function run()
     {
         $post = file_get_contents('php://input');
@@ -85,6 +125,13 @@ class Server
         return array('Pingback received and processed');
     }
 
+    /**
+     * Send the response back to the client.
+     *
+     * @param string $xml XML response to send
+     *
+     * @return void
+     */
     protected function sendResponse($xml)
     {
         header('Content-type: text/xml; charset=utf-8');

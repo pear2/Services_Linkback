@@ -1,6 +1,29 @@
 <?php
+/**
+ * This file is part of the PEAR2\Services\Pingback2 package.
+ *
+ * PHP version 5
+ *
+ * @category Services
+ * @package  PEAR2\Services\Pingback2
+ * @author   Christian Weiske <cweiske@php.net>
+ * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link     http://pear2.php.net/package/Services_Pingback2
+ */
 namespace \PEAR2\Services\Pingback2;
 
+/**
+ * Default implementation for the ILinkExists interface:
+ * Verifies that the source body contains a link to the target URL.
+ *
+ * You may use it in your own pingback server.
+ *
+ * @category Services
+ * @package  PEAR2\Services\Pingback2
+ * @author   Christian Weiske <cweiske@php.net>
+ * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * @link     http://pear2.php.net/package/Services_Pingback2
+ */
 class Server_Callback_LinkExistsDefault
     implements Server_Callback_ILinkExists
 {

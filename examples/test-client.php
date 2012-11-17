@@ -8,7 +8,7 @@ function __autoload($class) {
 $c = new \PEAR2\Services\Pingback2\Client();
 $c->setDebug(true);
 $r = $c->send(
-    //'http://p.cweiske.de/18?foob',
+    //'http://p.cweiske.de/21?f',
     $host . '/page-with-link.php',
     //$host . '/remote-headeronly.php'
     $host . '/remote-headlinkonly.php'

@@ -75,7 +75,7 @@ class Server
      * @param string $method Name of XML-RPC method (pingback.ping)
      * @param array  $params Array of method parameters
      *
-     * @return array Array of return values
+     * @return array Array of return values, or single string if all as fine
      */
     public function handlePingbackPing($method, $params)
     {
@@ -122,7 +122,7 @@ class Server
             );
         }
 
-        return array('Pingback received and processed');
+        return 'Pingback received and processed';
     }
 
     /**

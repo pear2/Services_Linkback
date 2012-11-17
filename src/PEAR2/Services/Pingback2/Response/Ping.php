@@ -70,14 +70,19 @@ class Response_Ping
             $this->code    = States::MESSAGE_INVALID;
             $this->message = 'Pingback response is invalid';
             return;
-        } else if ($params && !xmlrpc_is_fault($params)) {
-            $this->code    = null;
-            $this->message = $params[0];
+        } else if (is_array($params) && xmlrpc_is_fault($params)) {
+            $this->code    = $params['faultCode'];
+            $this->message = $params['faultString'];
             return;
         }
 
-        $this->code    = $params['faultCode'];
-        $this->message = $params['faultString'];
+        $this->code    = null;
+        if (is_array($params)) {
+            $this->message = $params[0];
+        } else {
+            //single string
+            $this->message = $params;
+        }
     }
 
     /**

@@ -228,14 +228,13 @@ class Server
     public function verifyLinkExists(
         $target, $source, $sourceBody, \HTTP_Request2_Response $res
     ) {
-        $exists = true;
+        $exists = false;
         foreach ($this->callbacks as $callback) {
             if (!$callback instanceof Server_Callback_ILink) {
                 continue;
             }
 
-            //FIXME: only count true?
-            $exists &= $callback->verifyLinkExists(
+            $exists |= $callback->verifyLinkExists(
                 $target, $source, $sourceBody, $res
             );
         }

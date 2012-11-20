@@ -69,6 +69,11 @@ class States
     const NO_LINK_IN_SOURCE = 17;
 
     /**
+     * The pingback is spam.
+     */
+    const SPAM = 18;
+
+    /**
      * The specified target URI does not exist.
      * Defined by the pingback specification.
      */

@@ -1,30 +1,28 @@
 <?php
 /**
- * This file is part of the PEAR2\Services\Pingback2 package.
+ * This file is part of the PEAR2\Services\Pingback package.
  *
  * PHP version 5
  *
  * @category Services
- * @package  PEAR2\Services\Pingback2
+ * @package  PEAR2\Services\Pingback
  * @author   Christian Weiske <cweiske@php.net>
  * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link     http://pear2.php.net/package/Services_Pingback2
+ * @link     http://pear2.php.net/package/Services_Pingback
  */
-namespace \PEAR2\Services\Pingback2;
+namespace PEAR2\Services\Pingback\Server\Callback;
 
 /**
- * Default implementation of the LinkExists interface.
- *
- * You may use it in your pingback server code.
+ * Pingback server callback interface: Vereidy that a link to $target exists
+ * in $source content.
  *
  * @category Services
- * @package  PEAR2\Services\Pingback2
+ * @package  PEAR2\Services\Pingback
  * @author   Christian Weiske <cweiske@php.net>
  * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link     http://pear2.php.net/package/Services_Pingback2
+ * @link     http://pear2.php.net/package/Services_Pingback
  */
-class Server_Callback_LinkExists
-    implements Server_Callback_ILinkExists
+class LinkExists implements ILink
 {
     /**
      * Verifies that a link from $source to $target exists.
@@ -39,14 +37,15 @@ class Server_Callback_LinkExists
     public function verifyLinkExists(
         $target, $source, $sourceBody, \HTTP_Request2_Response $res
     ) {
-        $doc = new DOMDocument();
+        $doc = new \DOMDocument();
         $doc->loadHTML($sourceBody);
-        $xpath = new DOMXPath($doc);
+        $xpath = new \DOMXPath($doc);
 
         $targetNoQuotes = str_replace('"', '', $target);
         $nodeList = $xpath->query(
             '//a[@href="' . $target . '"'
-            . ' or contains(@href, "' . $targetNoQuotes . '#"]'
+            . ' or contains(@href, "' . $targetNoQuotes . '#")'
+            . ']'
         );
 
         return $nodeList->length > 0;

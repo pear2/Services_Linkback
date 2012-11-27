@@ -5,7 +5,7 @@ function __autoload($class) {
 }
 
 class PingbackLogger
-    implements \PEAR2\Services\Pingback2\Server_Callback_IStorage
+    implements \PEAR2\Services\Pingback\Server\Callback\IStorage
 {
     public function storePingback(
         $target, $source, $sourceBody, \HTTP_Request2_Response $res
@@ -25,7 +25,7 @@ class PingbackLogger
     }
 }
 
-$s = new \PEAR2\Services\Pingback2\Server();
+$s = new \PEAR2\Services\Pingback\Server();
 $s->addCallback(new PingbackLogger());
 $s->run();
 

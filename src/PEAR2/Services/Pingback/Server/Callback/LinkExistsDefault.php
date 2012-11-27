@@ -1,31 +1,30 @@
 <?php
 /**
- * This file is part of the PEAR2\Services\Pingback2 package.
+ * This file is part of the PEAR2\Services\Pingback package.
  *
  * PHP version 5
  *
  * @category Services
- * @package  PEAR2\Services\Pingback2
+ * @package  PEAR2\Services\Pingback
  * @author   Christian Weiske <cweiske@php.net>
  * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link     http://pear2.php.net/package/Services_Pingback2
+ * @link     http://pear2.php.net/package/Services_Pingback
  */
-namespace \PEAR2\Services\Pingback2;
+namespace \PEAR2\Services\Pingback\Server\Callback;
 
 /**
- * Default implementation for the ILinkExists interface:
- * Verifies that the source body contains a link to the target URL.
+ * Default implementation of the LinkExists interface.
  *
- * You may use it in your own pingback server.
+ * You may use it in your pingback server code.
  *
  * @category Services
- * @package  PEAR2\Services\Pingback2
+ * @package  PEAR2\Services\Pingback
  * @author   Christian Weiske <cweiske@php.net>
  * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link     http://pear2.php.net/package/Services_Pingback2
+ * @link     http://pear2.php.net/package/Services_Pingback
  */
-class Server_Callback_LinkExistsDefault
-    implements Server_Callback_ILinkExists
+class LinkExists
+    implements ILinkExists
 {
     /**
      * Verifies that a link from $source to $target exists.

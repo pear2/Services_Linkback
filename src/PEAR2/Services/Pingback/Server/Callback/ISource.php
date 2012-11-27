@@ -1,27 +1,27 @@
 <?php
 /**
- * This file is part of the PEAR2\Services\Pingback2 package.
+ * This file is part of the PEAR2\Services\Pingback package.
  *
  * PHP version 5
  *
  * @category Services
- * @package  PEAR2\Services\Pingback2
+ * @package  PEAR2\Services\Pingback
  * @author   Christian Weiske <cweiske@php.net>
  * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link     http://pear2.php.net/package/Services_Pingback2
+ * @link     http://pear2.php.net/package/Services_Pingback
  */
-namespace PEAR2\Services\Pingback2;
+namespace PEAR2\Services\Pingback\Server\Callback;
 
 /**
  * ISource interface: Fetch the source URL contents.
  *
  * @category Services
- * @package  PEAR2\Services\Pingback2
+ * @package  PEAR2\Services\Pingback
  * @author   Christian Weiske <cweiske@php.net>
  * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link     http://pear2.php.net/package/Services_Pingback2
+ * @link     http://pear2.php.net/package/Services_Pingback
  */
-interface Server_Callback_ISource
+interface ISource
 {
     /**
      * Fetch the source URL and return it.
@@ -31,7 +31,7 @@ interface Server_Callback_ISource
      *
      * @return \HTTP_Request2_Response Response object
      *
-     * @throws Exception When something fatally fails
+     * @throws \SPb\Exception When something fatally fails
      */
     public function fetchSource($url);
 }

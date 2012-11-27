@@ -1,16 +1,16 @@
 <?php
 /**
- * This file is part of the PEAR2\Services\Pingback2 package.
+ * This file is part of the PEAR2\Services\Pingback package.
  *
  * PHP version 5
  *
  * @category Services
- * @package  PEAR2\Services\Pingback2
+ * @package  PEAR2\Services\Pingback
  * @author   Christian Weiske <cweiske@php.net>
  * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link     http://pear2.php.net/package/Services_Pingback2
+ * @link     http://pear2.php.net/package/Services_Pingback
  */
-namespace PEAR2\Services\Pingback2;
+namespace PEAR2\Services\Pingback;
 
 /**
  * Pingback server implementation.
@@ -26,10 +26,10 @@ namespace PEAR2\Services\Pingback2;
  * @fixme Add source context fetch code for easier integration
  *
  * @category Services
- * @package  PEAR2\Services\Pingback2
+ * @package  PEAR2\Services\Pingback
  * @author   Christian Weiske <cweiske@php.net>
  * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link     http://pear2.php.net/package/Services_Pingback2
+ * @link     http://pear2.php.net/package/Services_Pingback
  */
 class Server
 {
@@ -45,8 +45,8 @@ class Server
      */
     public function __construct()
     {
-        $this->addCallback(new Server_Callback_FetchSource());
-        $this->addCallback(new Server_Callback_LinkExists());
+        $this->addCallback(new Server\Callback\FetchSource());
+        $this->addCallback(new Server\Callback\LinkExists());
     }
 
     /**
@@ -178,7 +178,7 @@ class Server
     {
         $finalres = null;
         foreach ($this->callbacks as $callback) {
-            if (!$callback instanceof Server_Callback_ISource) {
+            if (!$callback instanceof Server\Callback\ISource) {
                 continue;
             }
 
@@ -203,7 +203,7 @@ class Server
     {
         $exists = true;
         foreach ($this->callbacks as $callback) {
-            if (!$callback instanceof Server_Callback_ITarget) {
+            if (!$callback instanceof Server\Callback\ITarget) {
                 continue;
             }
 
@@ -230,7 +230,7 @@ class Server
     ) {
         $exists = false;
         foreach ($this->callbacks as $callback) {
-            if (!$callback instanceof Server_Callback_ILink) {
+            if (!$callback instanceof Server\Callback\ILink) {
                 continue;
             }
 
@@ -258,7 +258,7 @@ class Server
         $target, $source, $sourceBody, \HTTP_Request2_Response $res
     ) {
         foreach ($this->callbacks as $callback) {
-            if (!$callback instanceof Server_Callback_IStorage) {
+            if (!$callback instanceof Server\Callback\IStorage) {
                 continue;
             }
             $callback->storePingback(

@@ -1,26 +1,26 @@
 <?php
 /**
- * This file is part of the PEAR2\Services\Pingback2 package.
+ * This file is part of the PEAR2\Services\Pingback package.
  *
  * PHP version 5
  *
  * @category Services
- * @package  PEAR2\Services\Pingback2
+ * @package  PEAR2\Services\Pingback
  * @author   Christian Weiske <cweiske@php.net>
  * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link     http://pear2.php.net/package/Services_Pingback2
+ * @link     http://pear2.php.net/package/Services_Pingback
  */
-namespace PEAR2\Services\Pingback2;
+namespace PEAR2\Services\Pingback;
 
 /**
  * Pingback client, allowing you to send pingbacks to remote sites
  * to tell them that you linked to them.
  *
  * @category Services
- * @package  PEAR2\Services\Pingback2
+ * @package  PEAR2\Services\Pingback
  * @author   Christian Weiske <cweiske@php.net>
  * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link     http://pear2.php.net/package/Services_Pingback2
+ * @link     http://pear2.php.net/package/Services_Pingback
  */
 class Client
 {
@@ -63,7 +63,7 @@ class Client
      * @param string $sourceUri URL on this side, it links to $targetUri
      * @param string $targetUri Remote URL that shall be notified about source
      *
-     * @return Response_Ping Pingback response object containing all error
+     * @return Response\Ping Pingback response object containing all error
      *                       and status information.
      */
     public function send($sourceUri, $targetUri)
@@ -75,7 +75,7 @@ class Client
         $serverUri = $this->discoverServer($targetUri);
         if ($serverUri === false) {
             //target resource is not pingback endabled
-            $rp = new Response_Ping(
+            $rp = new Response\Ping(
                 'No pingback server found for URI',
                 States::PINGBACK_UNSUPPORTED
             );
@@ -145,7 +145,7 @@ class Client
      * @param string $sourceUri URL on this side, it links to $targetUri
      * @param string $targetUri Remote URL that shall be notified about source
      *
-     * @return Response_Ping Pingback response object containing all error
+     * @return Response\Ping Pingback response object containing all error
      *                       and status information.
      */
     protected function sendPingback($serverUri, $sourceUri, $targetUri)
@@ -171,7 +171,7 @@ XML
             );
         $res = $req->send();
 
-        $pres = new Response_Ping();
+        $pres = new Response\Ping();
         $pres->setPingbackResponse($res, $this->debug);
         return $pres;
     }

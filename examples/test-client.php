@@ -5,7 +5,7 @@ function __autoload($class) {
     include_once str_replace(array('_', '\\'), '/', $class) . '.php';
 }
 
-$c = new \PEAR2\Services\Pingback2\Client();
+$c = new \PEAR2\Services\Pingback\Client();
 $c->setDebug(true);
 $r = $c->send(
     //'http://p.cweiske.de/21?f',

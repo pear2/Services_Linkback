@@ -149,6 +149,7 @@ class Server
     public function setCallbacks($callbacks)
     {
         $this->callbacks = $callbacks;
+        return $this;
     }
 
     /**
@@ -162,6 +163,7 @@ class Server
     public function addCallback($callback)
     {
         $this->callbacks[] = $callback;
+        return $this;
     }
 
     /**

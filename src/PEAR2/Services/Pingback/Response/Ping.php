@@ -62,7 +62,7 @@ class Ping
     }
 
     /**
-     * Set a HTTP response object and sets the internal variables
+     * Set a HTTP response object and sets the internal variables.
      *
      * @param object  $res   Pingback HTTP response object
      * @param boolean $debug If debugging is enabled. If true, the response is
@@ -74,7 +74,7 @@ class Ping
         HTTP_Request2_Response $res, $debug = false
     ) {
         if ($debug) {
-            $this->response = $res;
+            $this->setResponse($res);
         }
 
         if (intval($res->getStatus() / 100) != 2) {
@@ -150,11 +150,14 @@ class Ping
     }
 
     /**
-     * Sets the HTTP response object
+     * Sets the HTTP response object without any parsing.
+     * Useful for debugging errors of non-pingback responses.
      *
      * @param HTTP_Request2_Response $res Response object
      *
      * @return void
+     *
+     * @see setPingbackResponse()
      */
     public function setResponse(HTTP_Request2_Response $res)
     {

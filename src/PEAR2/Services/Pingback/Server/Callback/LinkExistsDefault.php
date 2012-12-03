@@ -13,9 +13,10 @@
 namespace \PEAR2\Services\Pingback\Server\Callback;
 
 /**
- * Default implementation of the LinkExists interface.
+ * Default implementation for the ILinkExists interface:
+ * Verifies that the source body contains a link to the target URL.
  *
- * You may use it in your pingback server code.
+ * You may use it in your own pingback server.
  *
  * @category Services
  * @package  PEAR2\Services\Pingback
@@ -23,7 +24,7 @@ namespace \PEAR2\Services\Pingback\Server\Callback;
  * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link     http://pear2.php.net/package/Services_Pingback
  */
-class LinkExists
+class LinkExistsDefault
     implements ILinkExists
 {
     /**

@@ -47,15 +47,6 @@ class Client
      */
     protected $debugResponse;
 
-
-    /**
-     * Initializes the HTTP request object
-     */
-    public function __construct()
-    {
-        $this->setRequest(new \HTTP_Request2());
-    }
-
     /**
      * Send a pingback, indicating a link from source to target.
      * The target's pingback server will be discovered automatically.
@@ -197,6 +188,9 @@ XML
      */
     public function getRequest()
     {
+        if ($this->request === null) {
+            $this->setRequest(new \HTTP_Request2());
+        }
         return $this->request;
     }
 

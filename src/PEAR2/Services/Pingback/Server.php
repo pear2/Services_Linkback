@@ -42,6 +42,13 @@ class Server
     protected $inputFile = 'php://input';
 
     /**
+     * Responder used to send out header and XML data
+     *
+     * @var Server\Responder
+     */
+    protected $responder;
+
+    /**
      * Registered callbacks of all types.
      *
      * @var array
@@ -72,7 +79,8 @@ class Server
         );
         $out = xmlrpc_server_call_method($xs, $post, null);
 
-        $this->sendResponse($out);
+        $resp = $this->getResponder();
+        $resp->send($out);
     }
 
     /**
@@ -134,16 +142,29 @@ class Server
     }
 
     /**
-     * Send the response back to the client.
+     * Set a responder object
      *
-     * @param string $xml XML response to send
+     * @param object $responder Server XML responder object
      *
-     * @return void
+     * @return self
      */
-    protected function sendResponse($xml)
+    public function setResponder(Server\Responder $responder)
     {
-        header('Content-type: text/xml; charset=utf-8');
-        echo $xml;
+        $this->responder = $responder;
+        return $this;
+    }
+
+    /**
+     * Get (and perhaps create) responder object.
+     *
+     * @return Server\Responder Responder object
+     */
+    public function getResponder()
+    {
+        if ($this->responder === null) {
+            $this->responder = new Server\Responder();
+        }
+        return $this->responder;
     }
 
     /**

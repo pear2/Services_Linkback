@@ -35,6 +35,13 @@ use HTTP_Request2_Response;
 class Server
 {
     /**
+     * The file the POST request date are read from
+     *
+     * @var string
+     */
+    protected $inputFile = 'php://input';
+
+    /**
      * Registered callbacks of all types.
      *
      * @var array
@@ -57,7 +64,7 @@ class Server
      */
     public function run()
     {
-        $post = file_get_contents('php://input');
+        $post = file_get_contents($this->inputFile);
 
         $xs = xmlrpc_server_create();
         xmlrpc_server_register_method(
@@ -137,6 +144,29 @@ class Server
     {
         header('Content-type: text/xml; charset=utf-8');
         echo $xml;
+    }
+
+    /**
+     * Modify the path of the file the POST data are read from
+     *
+     * @param string $inputFile Full path to input file
+     *
+     * @return self
+     */
+    public function setInputFile($inputFile)
+    {
+        $this->inputFile = $inputFile;
+        return $this;
+    }
+
+    /**
+     * Return the path of the file the POST data are read from
+     *
+     * @return string Path of POST input data file
+     */
+    public function getInputFile()
+    {
+        return $this->inputFile;
     }
 
     /**

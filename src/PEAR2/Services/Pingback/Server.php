@@ -11,6 +11,7 @@
  * @link     http://pear2.php.net/package/Services_Pingback
  */
 namespace PEAR2\Services\Pingback;
+use HTTP_Request2_Response;
 
 /**
  * Pingback server implementation.
@@ -172,7 +173,7 @@ class Server
      *
      * @param string $url URL to fetch
      *
-     * @return \HTTP_Request2_Response Response object
+     * @return HTTP_Request2_Response Response object
      *
      * @throws Exception When something fatally fails
      */
@@ -185,7 +186,7 @@ class Server
             }
 
             $res = $callback->fetchSource($url);
-            if ($res instanceof \HTTP_Request2_Response) {
+            if ($res instanceof HTTP_Request2_Response) {
                 $finalres = $res;;
             }
         }
@@ -228,7 +229,7 @@ class Server
      * @throws Exception When something fatally fails
      */
     public function verifyLinkExists(
-        $target, $source, $sourceBody, \HTTP_Request2_Response $res
+        $target, $source, $sourceBody, HTTP_Request2_Response $res
     ) {
         $exists = false;
         foreach ($this->callbacks as $callback) {
@@ -257,7 +258,7 @@ class Server
      * @throws Exception When storing a pingback fatally failed
      */
     protected function storePingback(
-        $target, $source, $sourceBody, \HTTP_Request2_Response $res
+        $target, $source, $sourceBody, HTTP_Request2_Response $res
     ) {
         foreach ($this->callbacks as $callback) {
             if (!$callback instanceof Server\Callback\IStorage) {

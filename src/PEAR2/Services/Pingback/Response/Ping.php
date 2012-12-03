@@ -12,6 +12,7 @@
  */
 namespace PEAR2\Services\Pingback\Response;
 use PEAR2\Services\Pingback\States as States;
+use HTTP_Request2_Response;
 
 /**
  * Response to a client ping() request.
@@ -43,7 +44,7 @@ class Ping
     /**
      * HTTP response object, if debugging is enabled in the client
      *
-     * @var \HTTP_Request2_Response
+     * @var HTTP_Request2_Response
      */
     protected $response;
 
@@ -70,7 +71,7 @@ class Ping
      * @return void
      */
     public function setPingbackResponse(
-        \HTTP_Request2_Response $res, $debug = false
+        HTTP_Request2_Response $res, $debug = false
     ) {
         if ($debug) {
             $this->response = $res;
@@ -141,7 +142,7 @@ class Ping
     /**
      * Returns the HTTP response if set
      *
-     * @return \HTTP_Request2_Response Response object
+     * @return HTTP_Request2_Response Response object
      */
     public function getResponse()
     {
@@ -151,11 +152,11 @@ class Ping
     /**
      * Sets the HTTP response object
      *
-     * @param \HTTP_Request2_Response $res Response object
+     * @param HTTP_Request2_Response $res Response object
      *
      * @return void
      */
-    public function setResponse(\HTTP_Request2_Response $res)
+    public function setResponse(HTTP_Request2_Response $res)
     {
         $this->response = $res;
     }

@@ -11,6 +11,7 @@
  * @link     http://pear2.php.net/package/Services_Pingback
  */
 namespace PEAR2\Services\Pingback;
+use HTTP_Request2;
 
 /**
  * Pingback client, allowing you to send pingbacks to remote sites
@@ -26,7 +27,7 @@ class Client
 {
     /**
      * HTTP request object that's used to do the requests
-     * @var \HTTP_Request2
+     * @var HTTP_Request2
      */
     protected $request;
 
@@ -89,7 +90,7 @@ class Client
         //at first, try a HEAD request that does not transfer so much data
         $req = $this->getRequest();
         $req->setUrl($targetUri);
-        $req->setMethod(\HTTP_Request2::METHOD_HEAD);
+        $req->setMethod(HTTP_Request2::METHOD_HEAD);
         $res = $req->send();
 
         $headerUri = $res->getHeader('X-Pingback');
@@ -99,7 +100,7 @@ class Client
         }
 
         //HEAD failed, do a normal GET
-        $req->setMethod(\HTTP_Request2::METHOD_GET);
+        $req->setMethod(HTTP_Request2::METHOD_GET);
         $res = $req->send();
         if ($this->debug) {
             $this->debugResponse = $res;
@@ -146,7 +147,7 @@ class Client
 
         $req = $this->getRequest();
         $req->setUrl($serverUri)
-            ->setMethod(\HTTP_Request2::METHOD_POST)
+            ->setMethod(HTTP_Request2::METHOD_POST)
             ->setHeader('Content-type: text/xml')
             ->setBody(
 <<<XML
@@ -184,12 +185,12 @@ XML
     /**
      * Returns the HTTP request object that's used internally
      *
-     * @return \HTTP_Request2
+     * @return HTTP_Request2
      */
     public function getRequest()
     {
         if ($this->request === null) {
-            $this->setRequest(new \HTTP_Request2());
+            $this->setRequest(new HTTP_Request2());
         }
         return $this->request;
     }
@@ -197,11 +198,11 @@ XML
     /**
      * Sets a custom HTTP request object that will be used to do HTTP requests
      *
-     * @param \HTTP_Request2 $request Request object
+     * @param HTTP_Request2 $request Request object
      *
      * @return self
      */
-    public function setRequest(\HTTP_Request2 $request)
+    public function setRequest(HTTP_Request2 $request)
     {
         $this->request = $request;
         return $this;

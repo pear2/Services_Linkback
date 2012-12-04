@@ -13,8 +13,10 @@
 namespace PEAR2\Services\Pingback\Server\Callback;
 
 /**
- * Pingback server callback interface: Vereidy that a link to $target exists
- * in $source content.
+ * Default implementation for the ILinkExists interface:
+ * Verifies that the source body contains a link to the target URL.
+ *
+ * You may use it in your own pingback server.
  *
  * @category Services
  * @package  PEAR2\Services\Pingback

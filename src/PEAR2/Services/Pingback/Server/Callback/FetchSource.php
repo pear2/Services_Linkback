@@ -23,7 +23,7 @@ namespace PEAR2\Services\Pingback\Server\Callback;
  * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link     http://pear2.php.net/package/Services_Pingback
  */
-class FetchSource implements ISource
+class FetchSource extends Base\HTTPRequest implements ISource
 {
     /**
      * Fetch the source URL and return it
@@ -34,8 +34,8 @@ class FetchSource implements ISource
      */
     public function fetchSource($url)
     {
-
-        $req = new \HTTP_Request2($url);
+        $req = $this->getRequest();
+        $req->setUrl($url);
         $req->setHeader(
             'accept',
             'text/html;q=0.9'

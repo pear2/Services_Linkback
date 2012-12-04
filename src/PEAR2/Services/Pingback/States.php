@@ -34,6 +34,11 @@ class States
     const CONTENT_TYPE = 101;
 
     /**
+     * Server callback object is invalid
+     */
+    const CALLBACK_INVALID = 150;
+
+    /**
      * Remote URL does not have a pingback server
      */
     const PINGBACK_UNSUPPORTED = 200;

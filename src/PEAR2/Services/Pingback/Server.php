@@ -197,9 +197,12 @@ class Server
      *                         of the interfaces
      *
      * @return self
+     *
+     * @throws Exception When one of the callback objects is invalid.
      */
-    public function setCallbacks($callbacks)
+    public function setCallbacks(array $callbacks)
     {
+        $this->verifyCallbacks($callbacks);
         $this->callbacks = $callbacks;
         return $this;
     }
@@ -211,11 +214,42 @@ class Server
      *                         of the interfaces
      *
      * @return self
+     *
+     * @throws Exception When one of the callback objects is invalid.
      */
     public function addCallback($callback)
     {
+        $this->verifyCallbacks(array($callback));
         $this->callbacks[] = $callback;
         return $this;
+    }
+
+    /**
+     * Validate callback objects.
+     * Checks that the callbacks implement at least one of the server callback
+     * interfaces.
+     *
+     * @param array $callbacks Array of callback objects
+     *
+     * @return void
+     *
+     * @throws Exception When one of the callback objects is invalid.
+     */
+    public function verifyCallbacks(array $callbacks)
+    {
+        foreach ($callbacks as $callback) {
+            if (!$callback instanceof Server\Callback\ILink
+                && !$callback instanceof Server\Callback\ISource
+                && !$callback instanceof Server\Callback\IStorage
+                && !$callback instanceof Server\Callback\ITarget
+            ) {
+                throw new Exception(
+                    'Callback object needs to implement one of the'
+                    . ' pingback server callback interfaces',
+                    States::CALLBACK_INVALID
+                );
+            }
+        }
     }
 
     /**

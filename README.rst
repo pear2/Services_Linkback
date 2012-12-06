@@ -32,11 +32,16 @@ Services\Pingback\Server\Callback\ITarget
 Verifies that the target URL exists in the local system.
 Useful to filter out pingbacks for non-existant URLs.
 
+FIXME: Default implementation
+
 
 Services\Pingback\Server\Callback\ISource
 =========================================
 Fetches the source URL for further verification.
 Used to determine if the source URL really exists.
+
+Services_Pingback provides the ``Services\Pingback\Server\Callback\FetchSource``
+callback class that is automatically registered with the server.
 
 
 Services\Pingback\Server\Callback\ILink
@@ -44,8 +49,14 @@ Services\Pingback\Server\Callback\ILink
 Verifies that the source URL content really links to the target URL.
 Used to filter out fake pingbacks that do not actually provide links.
 
+Services_Pingback provides the ``Services\Pingback\Server\Callback\LinkExists``
+callback class that is automatically registered with the server.
+
 
 Services\Pingback\Server\Callback\IStorage
 ==========================================
 After all verifications have been done, the storage finally handles
 the pingback - it could e.g. log it to a file or a database.
+
+Services_Pingback does not provide a default storage implementation; you have
+to write it yourself.

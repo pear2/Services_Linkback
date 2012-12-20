@@ -63,3 +63,10 @@ the pingback - it could e.g. log it to a file or a database.
 
 Services_Pingback does not provide a default storage implementation; you have
 to write it yourself.
+
+
+
+TODO
+----
+See what we can learn from
+http://www.acunetix.com/blog/web-security-zone/wordpress-pingback-vulnerability/

@@ -44,6 +44,11 @@ class States
     const PINGBACK_UNSUPPORTED = 200;
 
     /**
+     * The source document did not get loaded
+     */
+    const SOURCE_NOT_LOADED = 300;
+
+    /**
      * The XML-RPC call had too few parameters and could not be processed.
      * Defined by "Specification for Fault Code Interoperability".
      */
@@ -75,6 +80,7 @@ class States
 
     /**
      * The pingback is spam.
+     * Defined by the pingback specification.
      */
     const SPAM = 18;
 

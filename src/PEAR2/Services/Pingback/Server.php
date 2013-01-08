@@ -114,6 +114,13 @@ class Server
             }
 
             $res = $this->fetchSource($source);
+            if (!$res instanceof HTTP_Request2_Response) {
+                //programming error: callback did not return response object
+                return array(
+                    'faultCode'   => States::SOURCE_NOT_LOADED,
+                    'faultString' => 'Source document not loaded'
+                );
+            }
             if ($res->getStatus() / 100 != 2) {
                 //some error fetching the url
                 return array(

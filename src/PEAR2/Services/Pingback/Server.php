@@ -71,7 +71,7 @@ class Server
      */
     public function run()
     {
-        $post = file_get_contents($this->inputFile);
+        $post = file_get_contents($this->getInputFile());
 
         $xs = xmlrpc_server_create();
         xmlrpc_server_register_method(
@@ -91,7 +91,8 @@ class Server
      * @param string $method Name of XML-RPC method (pingback.ping)
      * @param array  $params Array of method parameters
      *
-     * @return array Array of return values, or single string if all as fine
+     * @return array Array of return values ('faultCode' and 'faultString'),
+     *               or single string if all is fine
      */
     public function handlePingbackPing($method, $params)
     {
@@ -109,7 +110,7 @@ class Server
             if (!$this->verifyTargetExists($target)) {
                 return array(
                     'faultCode'   => States::TARGET_URI_NOT_FOUND,
-                    'faultString' => 'The targer URI does not exist.'
+                    'faultString' => 'Target URI does not exist'
                 );
             }
 
@@ -125,15 +126,15 @@ class Server
                 //some error fetching the url
                 return array(
                     'faultCode'   => States::SOURCE_URI_NOT_FOUND,
-                    'faultString' => 'The source URI does not exist.'
+                    'faultString' => 'Source URI does not exist'
                 );
             }
 
             if (!$this->verifyLinkExists($target, $source, $res->getBody(), $res)) {
                 return array(
                     'faultCode'   => States::NO_LINK_IN_SOURCE,
-                    'faultString' => 'The source URI does not contain a link to the'
-                    . ' target URI, and so cannot be used as a source.'
+                    'faultString' => 'Source URI does not contain a link to the'
+                    . ' target URI, and thus cannot be used as a source'
                 );
             }
 

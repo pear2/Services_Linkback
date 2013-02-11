@@ -30,6 +30,11 @@ class Mock implements \PEAR2\Services\Pingback\Server\Callback\ITarget
     protected $targetExists = true;
 
     /**
+     * @var \Exception
+     */
+    protected $exception;
+
+    /**
      * Set the mock response to the "does the target exist" question.
      *
      * @param boolean $targetExists Return value for the verifyTargetExists() method
@@ -39,6 +44,19 @@ class Mock implements \PEAR2\Services\Pingback\Server\Callback\ITarget
     public function setTargetExists($targetExists)
     {
         $this->targetExists = $targetExists;
+    }
+
+    /**
+     * Set an exception that gets thrown when the verifyTargetExists() method
+     * gets called.
+     *
+     * @param \Exception $ex Exception or NULL
+     *
+     * @return void
+     */
+    public function setException(\Exception $ex = null)
+    {
+        $this->exception = $ex;
     }
 
     /**
@@ -52,6 +70,9 @@ class Mock implements \PEAR2\Services\Pingback\Server\Callback\ITarget
      */
     public function verifyTargetExists($target)
     {
+        if ($this->exception !== null) {
+            throw $this->exception;
+        }
         return $this->targetExists;
     }
 }

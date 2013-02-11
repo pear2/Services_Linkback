@@ -1,0 +1,10 @@
+<phpunit strict="true" colors="true" bootstrap="bootstrap.php">
+ <php>
+  <includePath>../src/</includePath>
+ </php>
+ <filter>
+  <whitelist addUncoveredFilesFromWhitelist="true">
+   <directory suffix=".php">../src/</directory>
+  </whitelist>
+ </filter>
+</phpunit>

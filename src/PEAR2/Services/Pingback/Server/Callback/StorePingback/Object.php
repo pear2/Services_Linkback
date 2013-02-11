@@ -10,11 +10,11 @@
  * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link     http://pear2.php.net/package/Services_Pingback
  */
-namespace PEAR2\Services\Pingback\Server\Callback;
-use PEAR2\Services\Pingback as SPb;
+namespace PEAR2\Services\Pingback\Server\Callback\StorePingback;
+use PEAR2\Services\Pingback\Server\Callback as SPbC;
 
 /**
- * Pingback server IStorage interface: Store the validated pingback somewhere.
+ * Stores the pingback in a class variable that can be accessed later.
  *
  * @category Services
  * @package  PEAR2\Services\Pingback
@@ -22,10 +22,15 @@ use PEAR2\Services\Pingback as SPb;
  * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link     http://pear2.php.net/package/Services_Pingback
  */
-interface IStorage
+class Object implements SPbC\IStorage
 {
+    public $target;
+    public $source;
+    public $sourceBody;
+    public $res;
+
     /**
-     * Stores the pingback somewhere.
+     * Stores the pingback in a class variable
      *
      * @param string $target     Target URI that should be linked in $source
      * @param string $source     Pingback source URI that should link to target
@@ -38,7 +43,12 @@ interface IStorage
      */
     public function storePingback(
         $target, $source, $sourceBody, \HTTP_Request2_Response $res
-    );
+    ) {
+        $this->target = $target;
+        $this->source = $source;
+        $this->sourceBody = $sourceBody;
+        $this->res = $res;
+    }
 
 }
 

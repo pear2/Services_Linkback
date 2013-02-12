@@ -65,14 +65,11 @@ class Client
         //FIXME: validate $sourceUri, $targetUri
 
         $serverUri = $this->discoverServer($targetUri);
-        if ($serverUri === false) {
-            //target resource is not pingback endabled
-            $rp = new Response\Ping(
-                'No pingback server found for URI',
-                States::PINGBACK_UNSUPPORTED
-            );
-            $rp->setResponse($this->debugResponse);
-            return $rp;
+        if (is_object($serverUri) && $serverUri instanceof Response\Ping) {
+            if ($this->debug) {
+                $serverUri->setResponse($this->debugResponse);
+            }
+            return $serverUri;
         }
 
         return $this->sendPingback($serverUri, $sourceUri, $targetUri);
@@ -83,7 +80,9 @@ class Client
      *
      * @param string $targetUri Some URL to discover the pingback server of
      *
-     * @return string|boolean False when it failed, server URI on success
+     * @return string|Response\Ping Server URI on success, Ping response object
+     *                              on failure. Response object has debug
+     *                              response not set.
      */
     protected function discoverServer($targetUri)
     {
@@ -92,6 +91,16 @@ class Client
         $req->setUrl($targetUri);
         $req->setMethod(HTTP_Request2::METHOD_HEAD);
         $res = $req->send();
+        if ($this->debug) {
+            $this->debugResponse = $res;
+        }
+
+        //FIXME: what about "Method not supported" error?
+        if (intval($res->getStatus() / 100) > 3) {
+            return new Response\Ping(
+                'Error fetching target URI', States::TARGET_URI_NOT_FOUND
+            );
+        }
 
         $headerUri = $res->getHeader('X-Pingback');
         //FIXME: validate URI
@@ -105,6 +114,11 @@ class Client
         if ($this->debug) {
             $this->debugResponse = $res;
         }
+        if (intval($res->getStatus() / 100) > 3) {
+            return new Response\Ping(
+                'Error fetching target URI', States::TARGET_URI_NOT_FOUND
+            );
+        }
 
         //yes, maybe the server does return this header now
         $headerUri = $res->getHeader('X-Pingback');
@@ -116,7 +130,11 @@ class Client
         $body = $res->getBody();
         $regex = '#<link rel="pingback" href="([^"]+)" ?/?>#';
         if (preg_match($regex, $body, $matches) == 0) {
-            return false;
+            //target resource is not pingback enabled
+            return new Response\Ping(
+                'No pingback server found for URI',
+                States::PINGBACK_UNSUPPORTED
+            );
         }
 
         $uri = $matches[1];

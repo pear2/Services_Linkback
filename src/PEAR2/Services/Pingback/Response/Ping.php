@@ -79,20 +79,20 @@ class Ping
 
         if (intval($res->getStatus() / 100) != 2) {
             $this->code    = States::HTTP_STATUS;
-            $this->message = 'HTTP status code is not 2xx';
+            $this->message = 'Pingback answer HTTP status code is not 2xx';
             return;
         }
 
         $types = explode(';', $res->getHeader('content-type'));
         if (count($types) < 1 || trim($types[0]) != 'text/xml') {
             $this->code    = States::CONTENT_TYPE;
-            $this->message = 'HTTP content type is not text/xml';
+            $this->message = 'Pingback answer HTTP content type is not text/xml';
             return;
         }
         $params = xmlrpc_decode($res->getBody());
         if ($params === null) {
             $this->code    = States::MESSAGE_INVALID;
-            $this->message = 'Pingback response is invalid';
+            $this->message = 'Pingback answer is invalid';
             return;
         } else if (is_array($params) && xmlrpc_is_fault($params)) {
             $this->code    = $params['faultCode'];
@@ -100,7 +100,7 @@ class Ping
             return;
         }
 
-        $this->code    = null;
+        $this->code = null;
         if (is_array($params)) {
             $this->message = $params[0];
         } else {

@@ -63,7 +63,7 @@ XML;
         $this->res = new Ping();
     }
 
-    public function testSetPingbackResponseOk()
+    public function testLoadFromPingbackResponseOk()
     {
         $httpres = \HTTP_Request2_Adapter_Mock::createResponseFromString(
             "HTTP/1.0 200 OK\r\n"
@@ -71,7 +71,7 @@ XML;
             . "\r\n"
             . static::$xmlOk
         );
-        $this->res->setPingbackResponse($httpres);
+        $this->res->loadFromPingbackResponse($httpres);
         $this->assertFalse($this->res->isError());
         $this->assertNull($this->res->getCode());
         $this->assertEquals(
@@ -79,7 +79,7 @@ XML;
         );
     }
 
-    public function testSetPingbackResponseMultipleMessages()
+    public function testLoadFromPingbackResponseMultipleMessages()
     {
         $httpres = \HTTP_Request2_Adapter_Mock::createResponseFromString(
             "HTTP/1.0 200 OK\r\n"
@@ -87,7 +87,7 @@ XML;
             . "\r\n"
             . static::$xmlOkMultiple
         );
-        $this->res->setPingbackResponse($httpres);
+        $this->res->loadFromPingbackResponse($httpres);
         $this->assertFalse($this->res->isError());
         $this->assertNull($this->res->getCode());
         //this is unfortunately not something we can change.
@@ -98,7 +98,7 @@ XML;
         );
     }
 
-    public function testSetPingbackResponseArray()
+    public function testLoadFromPingbackResponseArray()
     {
         $httpres = \HTTP_Request2_Adapter_Mock::createResponseFromString(
             "HTTP/1.0 200 OK\r\n"
@@ -106,7 +106,7 @@ XML;
             . "\r\n"
             . static::$xmlOkArray
         );
-        $this->res->setPingbackResponse($httpres);
+        $this->res->loadFromPingbackResponse($httpres);
         $this->assertFalse($this->res->isError());
         $this->assertNull($this->res->getCode());
         $this->assertEquals(
@@ -115,7 +115,7 @@ XML;
         $this->assertNull($this->res->getResponse());
     }
 
-    public function testSetPingbackResponseDebug()
+    public function testLoadFromPingbackResponseDebug()
     {
         $httpres = \HTTP_Request2_Adapter_Mock::createResponseFromString(
             "HTTP/1.0 200 OK\r\n"
@@ -123,7 +123,7 @@ XML;
             . "\r\n"
             . static::$xmlOk
         );
-        $this->res->setPingbackResponse($httpres, true);
+        $this->res->loadFromPingbackResponse($httpres, true);
         $this->assertFalse($this->res->isError());
         $this->assertNull($this->res->getCode());
         $this->assertEquals(
@@ -132,7 +132,7 @@ XML;
         $this->assertSame($httpres, $this->res->getResponse());
     }
 
-    public function testSetPingbackResponseNo200()
+    public function testLoadFromPingbackResponseNo200()
     {
         $httpres = \HTTP_Request2_Adapter_Mock::createResponseFromString(
             "HTTP/1.0 404 Not Found\r\n"
@@ -140,7 +140,7 @@ XML;
             . "\r\n"
             . static::$xmlOk
         );
-        $this->res->setPingbackResponse($httpres);
+        $this->res->loadFromPingbackResponse($httpres);
         $this->assertTrue($this->res->isError());
         $this->assertEquals(States::HTTP_STATUS, $this->res->getCode());
         $this->assertEquals(
@@ -149,7 +149,7 @@ XML;
         );
     }
 
-    public function testSetPingbackResponseWrongContentType()
+    public function testLoadFromPingbackResponseWrongContentType()
     {
         $httpres = \HTTP_Request2_Adapter_Mock::createResponseFromString(
             "HTTP/1.0 200 OK\r\n"
@@ -157,7 +157,7 @@ XML;
             . "\r\n"
             . static::$xmlOk
         );
-        $this->res->setPingbackResponse($httpres);
+        $this->res->loadFromPingbackResponse($httpres);
         $this->assertTrue($this->res->isError());
         $this->assertEquals(States::CONTENT_TYPE, $this->res->getCode());
         $this->assertEquals(
@@ -166,7 +166,7 @@ XML;
         );
     }
 
-    public function testSetPingbackResponseInvalidXmlRpc()
+    public function testLoadFromPingbackResponseInvalidXmlRpc()
     {
         $httpres = \HTTP_Request2_Adapter_Mock::createResponseFromString(
             "HTTP/1.0 200 OK\r\n"
@@ -174,7 +174,7 @@ XML;
             . "\r\n"
             . "<?x"
         );
-        $this->res->setPingbackResponse($httpres);
+        $this->res->loadFromPingbackResponse($httpres);
         $this->assertTrue($this->res->isError());
         $this->assertEquals(States::MESSAGE_INVALID, $this->res->getCode());
         $this->assertEquals(
@@ -183,7 +183,7 @@ XML;
         );
     }
 
-    public function testSetPingbackResponseError()
+    public function testLoadFromPingbackResponseError()
     {
         $httpres = \HTTP_Request2_Adapter_Mock::createResponseFromString(
             "HTTP/1.0 200 OK\r\n"
@@ -191,7 +191,7 @@ XML;
             . "\r\n"
             . static::$xmlError
         );
-        $this->res->setPingbackResponse($httpres);
+        $this->res->loadFromPingbackResponse($httpres);
         $this->assertTrue($this->res->isError());
         $this->assertEquals(32123, $this->res->getCode());
         $this->assertEquals('No, I do not want this', $this->res->getMessage());

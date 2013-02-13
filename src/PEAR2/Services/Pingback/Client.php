@@ -182,7 +182,7 @@ XML
         $res = $req->send();
 
         $pres = new Response\Ping();
-        $pres->setPingbackResponse($res, $this->debug);
+        $pres->loadFromPingbackResponse($res, $this->debug);
         return $pres;
     }
 

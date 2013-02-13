@@ -62,7 +62,7 @@ class Ping
     }
 
     /**
-     * Set a HTTP response object and sets the internal variables.
+     * Set a pingback HTTP response object and sets the internal variables.
      *
      * @param object  $res   Pingback HTTP response object
      * @param boolean $debug If debugging is enabled. If true, the response is
@@ -70,7 +70,7 @@ class Ping
      *
      * @return void
      */
-    public function setPingbackResponse(
+    public function loadFromPingbackResponse(
         HTTP_Request2_Response $res, $debug = false
     ) {
         if ($debug) {

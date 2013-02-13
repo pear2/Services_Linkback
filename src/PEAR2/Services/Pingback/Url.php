@@ -13,7 +13,7 @@
 namespace PEAR2\Services\Pingback;
 
 /**
- * Standard pingback exception class.
+ * URL validation helper class
  *
  * @category Services
  * @package  PEAR2\Services\Pingback
@@ -21,12 +21,28 @@ namespace PEAR2\Services\Pingback;
  * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link     http://pear2.php.net/package/Services_Pingback
  */
-class Exception extends \Exception
+class Url
 {
     /**
-     * The given URL is invalid: not absolute, not HTTP/HTTPS
+     * Validate that the given URL string is a HTTP(S) URL and absolute.
+     *
+     * @param string $url URL string to validate
+     *
+     * @return boolean True if the URL is valid, false if not
      */
-    const INVALID_URL = 300;
-}
+    public function validate($url)
+    {
+        if ($url == '') {
+            return false;
+        }
 
+        $urlObj = new \Net_URL2($url);
+        if (!$urlObj->isAbsolute()
+            || !in_array(strtolower($urlObj->getScheme()), array('https', 'http'))
+        ) {
+            return false;
+        }
+        return true;
+    }
+}
 ?>

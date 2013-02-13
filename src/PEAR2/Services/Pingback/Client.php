@@ -49,6 +49,21 @@ class Client
     protected $debugResponse;
 
     /**
+     * URL validation helper
+     *
+     * @var Url
+     */
+    protected $urlValidator;
+
+
+
+    public function __construct()
+    {
+        $this->urlValidator = new Url();
+    }
+
+
+    /**
      * Send a pingback, indicating a link from source to target.
      * The target's pingback server will be discovered automatically.
      *
@@ -57,12 +72,26 @@ class Client
      *
      * @return Response\Ping Pingback response object containing all error
      *                       and status information.
+     *
+     * @throws Exception When URI parameters are invalid
+     *                   (not absolute, not http/https)
      */
     public function send($sourceUri, $targetUri)
     {
         $this->debugResponse = null;
 
-        //FIXME: validate $sourceUri, $targetUri
+        if (!$this->urlValidator->validate($sourceUri)) {
+            return new Response\Ping(
+                'Source URI invalid: ' . $sourceUri,
+                States::INVALID_URI
+            );
+        }
+        if (!$this->urlValidator->validate($targetUri)) {
+            return new Response\Ping(
+                'Target URI invalid: ' . $targetUri,
+                States::INVALID_URI
+            );
+        }
 
         $serverUri = $this->discoverServer($targetUri);
         if (is_object($serverUri) && $serverUri instanceof Response\Ping) {
@@ -104,8 +133,13 @@ class Client
         }
 
         $headerUri = $res->getHeader('X-Pingback');
-        //FIXME: validate URI
         if ($headerUri !== null) {
+            if (!$this->urlValidator->validate($headerUri)) {
+                return new Response\Ping(
+                    'X-Pingback server URI invalid: ' . $headerUri,
+                    States::INVALID_URI
+                );
+            }
             return $headerUri;
         }
 
@@ -123,8 +157,13 @@ class Client
 
         //yes, maybe the server does return this header now
         $headerUri = $res->getHeader('X-Pingback');
-        //FIXME: validate URI
         if ($headerUri !== null) {
+            if (!$this->urlValidator->validate($headerUri)) {
+                return new Response\Ping(
+                    'X-Pingback server URI invalid: ' . $headerUri,
+                    States::INVALID_URI
+                );
+            }
             return $headerUri;
         }
 
@@ -144,7 +183,14 @@ class Client
             array('&', '<', '>', '"'),
             $uri
         );
-        //FIXME: validate URI
+
+        if (!$this->urlValidator->validate($uri)) {
+            return new Response\Ping(
+                'Pingback server URI invalid: ' . $uri,
+                States::INVALID_URI
+            );
+        }
+
         return $uri;
     }
 

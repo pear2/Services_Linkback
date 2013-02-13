@@ -44,6 +44,11 @@ class States
     const PINGBACK_UNSUPPORTED = 200;
 
     /**
+     * The given URI is invalid (not absolute, not http/https)
+     */
+    const INVALID_URI = 201;
+
+    /**
      * The source document did not get loaded
      */
     const SOURCE_NOT_LOADED = 300;

@@ -56,10 +56,20 @@ class Server
     protected $callbacks = array();
 
     /**
+     * URL validation helper
+     *
+     * @var Url
+     */
+    protected $urlValidator;
+
+
+
+    /**
      * Registers default callbacks
      */
     public function __construct()
     {
+        $this->urlValidator = new Url();
         $this->addCallback(new Server\Callback\FetchSource());
         $this->addCallback(new Server\Callback\LinkExists());
     }
@@ -102,19 +112,31 @@ class Server
                 'faultString' => '2 parameters required'
             );
         }
-        $source = $params[0];
-        $target = $params[1];
-        //FIXME: validate URIs
+        $sourceUri = $params[0];
+        $targetUri = $params[1];
+
+        if (!$this->urlValidator->validate($sourceUri)) {
+            return array(
+                'faultCode'   => States::INVALID_URI,
+                'faultString' => 'Source URI invalid (not absolute, not http/https)'
+            );
+        }
+        if (!$this->urlValidator->validate($targetUri)) {
+            return array(
+                'faultCode'   => States::INVALID_URI,
+                'faultString' => 'Source URI invalid (not absolute, not http/https)'
+            );
+        }
 
         try {
-            if (!$this->verifyTargetExists($target)) {
+            if (!$this->verifyTargetExists($targetUri)) {
                 return array(
                     'faultCode'   => States::TARGET_URI_NOT_FOUND,
                     'faultString' => 'Target URI does not exist'
                 );
             }
 
-            $res = $this->fetchSource($source);
+            $res = $this->fetchSource($sourceUri);
             if (!$res instanceof HTTP_Request2_Response) {
                 //programming error: callback did not return response object
                 return array(
@@ -130,7 +152,10 @@ class Server
                 );
             }
 
-            if (!$this->verifyLinkExists($target, $source, $res->getBody(), $res)) {
+            $exists = $this->verifyLinkExists(
+                $targetUri, $sourceUri, $res->getBody(), $res
+            );
+            if (!$exists) {
                 return array(
                     'faultCode'   => States::NO_LINK_IN_SOURCE,
                     'faultString' => 'Source URI does not contain a link to the'
@@ -138,7 +163,7 @@ class Server
                 );
             }
 
-            $this->storePingback($target, $source, $res->getBody(), $res);
+            $this->storePingback($targetUri, $sourceUri, $res->getBody(), $res);
         } catch (\Exception $e) {
             return array(
                 'faultCode'   => $e->getCode(),

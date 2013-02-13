@@ -57,6 +57,42 @@ HTM;
         $this->client->setRequest($req);
     }
 
+    public function testSendInvalidSource()
+    {
+        $res = $this->client->send(
+            'article.htm', 'http://example.org/'
+        );
+        $this->assertTrue($res->isError());
+        $this->assertEquals(States::INVALID_URI, $res->getCode());
+        $this->assertEquals(
+            'Source URI invalid: article.htm', $res->getMessage()
+        );
+    }
+
+    public function testSendEmptySource()
+    {
+        $res = $this->client->send(
+            '', 'http://example.org/'
+        );
+        $this->assertTrue($res->isError());
+        $this->assertEquals(States::INVALID_URI, $res->getCode());
+        $this->assertEquals(
+            'Source URI invalid: ', $res->getMessage()
+        );
+    }
+
+    public function testSendInvalidTarget()
+    {
+        $res = $this->client->send(
+            'http://example.org/', 'target.htm'
+        );
+        $this->assertTrue($res->isError());
+        $this->assertEquals(States::INVALID_URI, $res->getCode());
+        $this->assertEquals(
+            'Target URI invalid: target.htm', $res->getMessage()
+        );
+    }
+
     public function testDiscoverServerGet()
     {
         //HEAD request

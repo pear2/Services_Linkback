@@ -95,8 +95,9 @@ class Client
             $this->debugResponse = $res;
         }
 
-        //FIXME: what about "Method not supported" error?
-        if (intval($res->getStatus() / 100) > 3) {
+        if (intval($res->getStatus() / 100) > 3
+            && $res->getStatus() != 405 //method not supported/allowed
+        ) {
             return new Response\Ping(
                 'Error fetching target URI', States::TARGET_URI_NOT_FOUND
             );

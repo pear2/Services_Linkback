@@ -57,7 +57,7 @@ HTM;
         $this->client->setRequest($req);
     }
 
-    public function testDiscoverServerHead()
+    public function testDiscoverServerGet()
     {
         //HEAD request
         $this->mock->addResponse(
@@ -91,8 +91,44 @@ HTM;
         );
     }
 
-    public function testDiscoverServerGetHeader()
+    public function testDiscoverServerHead()
     {
+        //HEAD request
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "Foo: bar\r\n"
+            . "X-Pingback: http://example.org/pingback-server\r\n"
+            . "Bar: foo\r\n",
+            'http://example.org/article'
+        );
+        //pingback request
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "Content-Type: text/xml\r\n"
+            . "\r\n"
+            . static::$xmlPingback,
+            'http://example.org/pingback-server'
+        );
+
+        $res = $this->client->send(
+            'http://example.org/myblog',
+            'http://example.org/article'
+        );
+        $this->assertFalse($res->isError());
+        $this->assertNull($res->getCode());
+        $this->assertEquals(
+            'Pingback received and processed', $res->getMessage()
+        );
+    }
+
+    public function testDiscoverServerHeadMethodNotAllowed()
+    {
+        //HEAD request
+        $this->mock->addResponse(
+            "HTTP/1.0 405 Method not allowed\r\n",
+            'http://example.org/article'
+        );
+        //GET request
         $this->mock->addResponse(
             "HTTP/1.0 200 OK\r\n"
             . "Foo: bar\r\n"

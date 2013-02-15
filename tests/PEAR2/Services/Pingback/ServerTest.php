@@ -114,6 +114,34 @@ XML
         );
     }
 
+    public function testHandlePingbackPingSourceInvalid()
+    {
+        $res = $this->server->handlePingbackPing(
+            'pingback.ping',
+            array('/path/to/source', 'http://127.0.0.1/target')
+        );
+        $this->assertInternalType('array', $res);
+        $this->assertEquals(States::INVALID_URI, $res['faultCode']);
+        $this->assertEquals(
+            'Source URI invalid (not absolute, not http/https)',
+            $res['faultString']
+        );
+    }
+
+    public function testHandlePingbackPingTargetInvalid()
+    {
+        $res = $this->server->handlePingbackPing(
+            'pingback.ping',
+            array('http://127.0.0.1/source', '/path/to/target')
+        );
+        $this->assertInternalType('array', $res);
+        $this->assertEquals(States::INVALID_URI, $res['faultCode']);
+        $this->assertEquals(
+            'Target URI invalid (not absolute, not http/https)',
+            $res['faultString']
+        );
+    }
+
     public function testHandlePingbackPingTargetDoesNotExist()
     {
         $mockLink = new Server\Callback\TargetExists\Mock();

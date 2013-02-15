@@ -124,7 +124,7 @@ class Server
         if (!$this->urlValidator->validate($targetUri)) {
             return array(
                 'faultCode'   => States::INVALID_URI,
-                'faultString' => 'Source URI invalid (not absolute, not http/https)'
+                'faultString' => 'Target URI invalid (not absolute, not http/https)'
             );
         }
 

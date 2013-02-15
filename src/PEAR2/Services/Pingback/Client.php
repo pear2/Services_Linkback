@@ -72,9 +72,6 @@ class Client
      *
      * @return Response\Ping Pingback response object containing all error
      *                       and status information.
-     *
-     * @throws Exception When URI parameters are invalid
-     *                   (not absolute, not http/https)
      */
     public function send($sourceUri, $targetUri)
     {
@@ -113,7 +110,7 @@ class Client
      *                              on failure. Response object has debug
      *                              response not set.
      */
-    protected function discoverServer($targetUri)
+    public function discoverServer($targetUri)
     {
         //at first, try a HEAD request that does not transfer so much data
         $req = $this->getRequest();
@@ -128,7 +125,7 @@ class Client
             && $res->getStatus() != 405 //method not supported/allowed
         ) {
             return new Response\Ping(
-                'Error fetching target URI', States::TARGET_URI_NOT_FOUND
+                'Error fetching target URI via HEAD', States::TARGET_URI_NOT_FOUND
             );
         }
 
@@ -136,7 +133,7 @@ class Client
         if ($headerUri !== null) {
             if (!$this->urlValidator->validate($headerUri)) {
                 return new Response\Ping(
-                    'X-Pingback server URI invalid: ' . $headerUri,
+                    'HEAD X-Pingback server URI invalid: ' . $headerUri,
                     States::INVALID_URI
                 );
             }
@@ -160,7 +157,7 @@ class Client
         if ($headerUri !== null) {
             if (!$this->urlValidator->validate($headerUri)) {
                 return new Response\Ping(
-                    'X-Pingback server URI invalid: ' . $headerUri,
+                    'GET X-Pingback server URI invalid: ' . $headerUri,
                     States::INVALID_URI
                 );
             }
@@ -186,7 +183,7 @@ class Client
 
         if (!$this->urlValidator->validate($uri)) {
             return new Response\Ping(
-                'Pingback server URI invalid: ' . $uri,
+                'HTML link pingback server URI invalid: ' . $uri,
                 States::INVALID_URI
             );
         }

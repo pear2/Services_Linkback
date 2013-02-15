@@ -34,6 +34,18 @@ XML;
 </html>
 HTM;
 
+    protected static $htmlWithInvalidPingback = <<<HTM
+<html>
+ <head>
+  <title>article</title>
+  <link rel="pingback" href="/path/to/pingback-server" />
+ </head>
+ <body>
+  <p>This is an article</p>
+ </body>
+</html>
+HTM;
+
     protected static $htmlWithoutPingback = <<<HTM
 <html>
  <head>
@@ -55,6 +67,36 @@ HTM;
 
         $this->client = new Client();
         $this->client->setRequest($req);
+    }
+
+    public function testSend()
+    {
+        //HEAD request
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "Foo: bar\r\n"
+            . "X-Pingback: http://example.org/pingback-server\r\n"
+            . "Bar: foo\r\n",
+            'http://example.org/article'
+        );
+        //pingback request
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "Content-Type: text/xml\r\n"
+            . "\r\n"
+            . static::$xmlPingback,
+            'http://example.org/pingback-server'
+        );
+
+        $res = $this->client->send(
+            'http://example.org/source',
+            'http://example.org/article'
+        );
+        $this->assertFalse($res->isError());
+        $this->assertNull($res->getCode());
+        $this->assertEquals(
+            'Pingback received and processed', $res->getMessage()
+        );
     }
 
     public function testSendInvalidSource()
@@ -108,22 +150,39 @@ HTM;
             . "Bar: foo\r\n",
             'http://example.org/article'
         );
-        $this->mock->addResponse(
-            "HTTP/1.0 200 OK\r\n"
-            . "Content-Type: text/xml\r\n"
-            . "\r\n"
-            . static::$xmlPingback,
-            'http://example.org/pingback-server'
-        );
 
-        $res = $this->client->send(
-            'http://example.org/myblog',
+        $res = $this->client->discoverServer(
             'http://example.org/article'
         );
-        $this->assertFalse($res->isError());
-        $this->assertNull($res->getCode());
+        $this->assertInternalType('string', $res);
+        $this->assertEquals('http://example.org/pingback-server', $res);
+    }
+
+    public function testDiscoverServerGetInvalid()
+    {
+        //HEAD request
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n",
+            'http://example.org/article'
+        );
+        //GET request
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "Foo: bar\r\n"
+            . "X-Pingback: /path/to/pingback-server\r\n"
+            . "Bar: foo\r\n",
+            'http://example.org/article'
+        );
+
+        $res = $this->client->discoverServer(
+            'http://example.org/article'
+        );
+        $this->assertInstanceOf('\PEAR2\Services\Pingback\Response\Ping', $res);
+        $this->assertTrue($res->isError());
+        $this->assertEquals(States::INVALID_URI, $res->getCode());
         $this->assertEquals(
-            'Pingback received and processed', $res->getMessage()
+            'GET X-Pingback server URI invalid: /path/to/pingback-server',
+            $res->getMessage()
         );
     }
 
@@ -137,23 +196,33 @@ HTM;
             . "Bar: foo\r\n",
             'http://example.org/article'
         );
-        //pingback request
-        $this->mock->addResponse(
-            "HTTP/1.0 200 OK\r\n"
-            . "Content-Type: text/xml\r\n"
-            . "\r\n"
-            . static::$xmlPingback,
-            'http://example.org/pingback-server'
-        );
 
-        $res = $this->client->send(
-            'http://example.org/myblog',
+        $res = $this->client->discoverServer(
             'http://example.org/article'
         );
-        $this->assertFalse($res->isError());
-        $this->assertNull($res->getCode());
+        $this->assertInternalType('string', $res);
+        $this->assertEquals('http://example.org/pingback-server', $res);
+    }
+
+    public function testDiscoverServerHeadInvalid()
+    {
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "Foo: bar\r\n"
+            . "X-Pingback: /path/to/pingback-server\r\n"
+            . "Bar: foo\r\n",
+            'http://example.org/article'
+        );
+
+        $res = $this->client->discoverServer(
+            'http://example.org/article'
+        );
+        $this->assertInstanceOf('\PEAR2\Services\Pingback\Response\Ping', $res);
+        $this->assertTrue($res->isError());
+        $this->assertEquals(States::INVALID_URI, $res->getCode());
         $this->assertEquals(
-            'Pingback received and processed', $res->getMessage()
+            'HEAD X-Pingback server URI invalid: /path/to/pingback-server',
+            $res->getMessage()
         );
     }
 
@@ -172,23 +241,12 @@ HTM;
             . "Bar: foo\r\n",
             'http://example.org/article'
         );
-        $this->mock->addResponse(
-            "HTTP/1.0 200 OK\r\n"
-            . "Content-Type: text/xml\r\n"
-            . "\r\n"
-            . static::$xmlPingback,
-            'http://example.org/pingback-server'
-        );
 
-        $res = $this->client->send(
-            'http://example.org/myblog',
+        $res = $this->client->discoverServer(
             'http://example.org/article'
         );
-        $this->assertFalse($res->isError());
-        $this->assertNull($res->getCode());
-        $this->assertEquals(
-            'Pingback received and processed', $res->getMessage()
-        );
+        $this->assertInternalType('string', $res);
+        $this->assertEquals('http://example.org/pingback-server', $res);
     }
 
     public function testDiscoverServerTargetUriNotFoundHead()
@@ -203,11 +261,11 @@ HTM;
         );
         $this->assertTrue($res->isError());
         $this->assertEquals(States::TARGET_URI_NOT_FOUND, $res->getCode());
-        $this->assertEquals('Error fetching target URI', $res->getMessage());
+        $this->assertEquals('Error fetching target URI via HEAD', $res->getMessage());
         $this->assertNull($res->getResponse());
     }
 
-    public function testDiscoverServerTargetUriNotFoundHeadDebug()
+    public function testSendTargetUriNotFoundHeadDebug()
     {
         $this->mock->addResponse(
             "HTTP/1.0 404 Not Found\r\n",
@@ -246,7 +304,7 @@ HTM;
     }
 
 
-    public function testDiscoverServerTargetUriNotFoundGetDebug()
+    public function testSendTargetUriNotFoundGetDebug()
     {
         $this->mock->addResponse(
             "HTTP/1.0 200 OK\r\n"
@@ -282,21 +340,38 @@ HTM;
             . static::$htmlWithPingback,
             'http://example.org/article'
         );
-        $this->mock->addResponse(
-            "HTTP/1.0 200 OK\r\n"
-            . "Content-Type: text/xml\r\n"
-            . "\r\n"
-            . static::$xmlPingback,
-            'http://example.org/article-pingback-server'
-        );
 
-        $res = $this->client->send(
-            'http://example.org/myblog',
+        $res = $this->client->discoverServer(
             'http://example.org/article'
         );
-        $this->assertFalse($res->isError());
-        $this->assertNull($res->getCode());
-        $this->assertEquals('Pingback received and processed', $res->getMessage());
+        $this->assertInternalType('string', $res);
+        $this->assertEquals('http://example.org/article-pingback-server', $res);
+    }
+
+    public function testDiscoverServerHtmlInvalid()
+    {
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "\r\n",
+            'http://example.org/article'
+        );
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "\r\n"
+            . static::$htmlWithInvalidPingback,
+            'http://example.org/article'
+        );
+
+        $res = $this->client->discoverServer(
+            'http://example.org/article'
+        );
+        $this->assertInstanceOf('\PEAR2\Services\Pingback\Response\Ping', $res);
+        $this->assertTrue($res->isError());
+        $this->assertEquals(States::INVALID_URI, $res->getCode());
+        $this->assertEquals(
+            'HTML link pingback server URI invalid: /path/to/pingback-server',
+            $res->getMessage()
+        );
     }
 
     public function testDiscoverServerHtmlNoServer()
@@ -313,10 +388,10 @@ HTM;
             'http://example.org/article'
         );
 
-        $res = $this->client->send(
-            'http://example.org/myblog',
+        $res = $this->client->discoverServer(
             'http://example.org/article'
         );
+        $this->assertInstanceOf('\PEAR2\Services\Pingback\Response\Ping', $res);
         $this->assertTrue($res->isError());
         $this->assertEquals(States::PINGBACK_UNSUPPORTED, $res->getCode());
         $this->assertEquals(

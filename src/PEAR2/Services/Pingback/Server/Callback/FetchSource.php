@@ -42,12 +42,9 @@ class FetchSource extends Base\HTTPRequest implements ISource
             . ', application/xhtml+xml;q=0.9'
             . ', */*;q=0.1'
         );
-        /* FIXME: add content range to respect:
-          In order to avoid susceptibility to denial of service attacks,
-          pingback servers that fetch the specified source document
-          (as described in section 3) are urged to impose limits on the
-          size of the source document to be examined and the rate of data
-          transfer.  */
+
+        //only request 100k content to prevent denial of service attacks
+        $req->setHeader('range', 'bytes=0-102400');
         return $req->send();
     }
 }

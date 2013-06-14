@@ -64,7 +64,33 @@ class LinkExists implements ILink
             . ']'
         );
 
-        return $nodeList->length > 0;
+        if ($nodeList->length > 0) {
+            return true;
+        }
+
+        //now check for relative links - needed when pages on the same server
+        // link each other
+        if (parse_url($source, PHP_URL_HOST) != parse_url($target, PHP_URL_HOST)) {
+            //not on the same server
+            return false;
+        }
+
+        $sourceUrl = new \Net_URL2($source);
+        //FIXME: base URL in html code
+
+        $xpath = new \DOMXPath($doc);
+        $xpath->registerNamespace('h', 'http://www.w3.org/1999/xhtml');
+        $links = $xpath->query('//*[self::a or self::h:a]');
+        foreach ($links as $link) {
+            $url = (string)$sourceUrl->resolve(
+                $link->attributes->getNamedItem('href')->nodeValue
+            );
+            if ($url == $target) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 

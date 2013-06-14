@@ -40,13 +40,27 @@ class LinkExists implements ILink
         $target, $source, $sourceBody, \HTTP_Request2_Response $res
     ) {
         $doc = new \DOMDocument();
-        $doc->loadHTML($sourceBody);
+
+        $typeParts = explode(';', $res->getHeader('content-type'));
+        $type = $typeParts[0];
+        if ($type == 'application/xhtml+xml'
+            || $type == 'application/xml'
+            || $type == 'text/xml'
+        ) {
+            $doc->loadXML($sourceBody);
+        } else {
+            $doc->loadHTML($sourceBody);
+        }
+
         $xpath = new \DOMXPath($doc);
+        $xpath->registerNamespace('h', 'http://www.w3.org/1999/xhtml');
 
         $targetNoQuotes = str_replace('"', '', $target);
         $nodeList = $xpath->query(
-            '//a[@href="' . $target . '"'
-            . ' or contains(@href, "' . $targetNoQuotes . '#")'
+            '//*[(self::a or self::h:a)'
+            . ' and (@href="' . $target . '"'
+            . ' or starts-with(@href, "' . $targetNoQuotes . '#")'
+            . ')'
             . ']'
         );
 

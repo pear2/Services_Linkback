@@ -38,9 +38,11 @@ class FetchSource extends Base\HTTPRequest implements ISource
         $req->setUrl($url);
         $req->setHeader(
             'accept',
-            'text/html;q=0.9'
-            . ', application/xhtml+xml;q=0.9'
-            . ', */*;q=0.1'
+            'application/xhtml+xml; q=1'
+            . ', application/xml; q=0.9'
+            . ', text/xml; q=0.9'
+            . ', text/html; q=0.5'
+            . ', */*; q=0.1'
         );
 
         //only request 100k content to prevent denial of service attacks

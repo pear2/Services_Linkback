@@ -144,7 +144,7 @@ class Server
                     'faultString' => 'Source document not loaded'
                 );
             }
-            if ($res->getStatus() / 100 != 2) {
+            if (intval($res->getStatus() / 100) != 2) {
                 //some error fetching the url
                 return array(
                     'faultCode'   => States::SOURCE_URI_NOT_FOUND,

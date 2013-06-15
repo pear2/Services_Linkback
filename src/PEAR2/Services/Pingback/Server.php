@@ -90,6 +90,7 @@ class Server
         $out = xmlrpc_server_call_method($xs, $post, null);
 
         $resp = $this->getResponder();
+        header('HTTP/1.0 200 OK');
         $resp->send($out);
     }
 

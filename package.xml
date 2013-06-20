@@ -126,14 +126,14 @@ Customizable and unit-tested Pingback client and server implementation.
    <pearinstaller>
     <min>2.0.0a1</min>
    </pearinstaller>
-   <extension>
-    <name>xmlrpc</name>
-   </extension>
    <package>
     <name>Net_URL2</name>
     <channel>pear.php.net</channel>
     <min>1.0.0</min>
    </package>
+   <extension>
+    <name>xmlrpc</name>
+   </extension>
   </required>
  </dependencies>
 

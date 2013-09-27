@@ -57,6 +57,15 @@ XML;
 </methodResponse>
 XML;
 
+    protected static $jsonOk = <<<JSN
+{"result":"Webmention received and processed"}
+JSN;
+
+    protected static $jsonError = <<<JSN
+{"error":"no_link_found","error_description": "The source URI does not contain a link to the target URI"}
+JSN;
+
+
 
     public function setUp()
     {
@@ -197,6 +206,37 @@ XML;
         $this->assertEquals('No, I do not want this', $this->res->getMessage());
     }
 
-}
+    public function testLoadFromWebmentionResponseOk()
+    {
+        $httpres = \HTTP_Request2_Adapter_Mock::createResponseFromString(
+            "HTTP/1.0 200 OK\r\n"
+            . "Content-Type: application/json\r\n"
+            . "\r\n"
+            . static::$jsonOk
+        );
+        $this->res->loadFromWebmentionResponse($httpres);
+        $this->assertFalse($this->res->isError());
+        $this->assertNull($this->res->getCode());
+        $this->assertEquals(
+            'Webmention received and processed', $this->res->getMessage()
+        );
+    }
 
+    public function testLoadFromWebmentionResponseError()
+    {
+        $httpres = \HTTP_Request2_Adapter_Mock::createResponseFromString(
+            "HTTP/1.0 200 OK\r\n"
+            . "Content-Type: application/json\r\n"
+            . "\r\n"
+            . static::$jsonError
+        );
+        $this->res->loadFromWebmentionResponse($httpres);
+        $this->assertTrue($this->res->isError());
+        $this->assertEquals(States::NO_LINK_IN_SOURCE, $this->res->getCode());
+        $this->assertEquals(
+            'The source URI does not contain a link to the target URI',
+            $this->res->getMessage()
+        );
+    }
+}
 ?>

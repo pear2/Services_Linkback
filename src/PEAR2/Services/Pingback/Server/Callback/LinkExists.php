@@ -11,6 +11,7 @@
  * @link     http://pear2.php.net/package/Services_Pingback
  */
 namespace PEAR2\Services\Pingback\Server\Callback;
+use PEAR2\Services\Pingback\DomLoader;
 
 /**
  * Default implementation for the ILinkExists interface:
@@ -39,19 +40,7 @@ class LinkExists implements ILink
     public function verifyLinkExists(
         $target, $source, $sourceBody, \HTTP_Request2_Response $res
     ) {
-        $doc = new \DOMDocument();
-
-        $typeParts = explode(';', $res->getHeader('content-type'));
-        $type = $typeParts[0];
-        if ($type == 'application/xhtml+xml'
-            || $type == 'application/xml'
-            || $type == 'text/xml'
-        ) {
-            $doc->loadXML($sourceBody);
-        } else {
-            $doc->loadHTML($sourceBody);
-        }
-
+        $doc = DomLoader::load($sourceBody, $res);
         $xpath = new \DOMXPath($doc);
         $xpath->registerNamespace('h', 'http://www.w3.org/1999/xhtml');
 

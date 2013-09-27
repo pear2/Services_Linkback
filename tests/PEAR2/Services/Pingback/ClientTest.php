@@ -22,11 +22,39 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 </methodResponse>
 XML;
 
+    protected static $jsonWebmention = <<<JSN
+{"result":"Webmention received and processed"}
+JSN;
+
     protected static $htmlWithPingback = <<<HTM
 <html>
  <head>
   <title>article</title>
   <link rel="pingback" href="http://example.org/article-pingback-server" />
+ </head>
+ <body>
+  <p>This is an article</p>
+ </body>
+</html>
+HTM;
+
+    protected static $htmlWithWebmention = <<<HTM
+<html>
+ <head>
+  <title>article</title>
+  <link rel="webmention" href="http://example.org/article-webmention-server" />
+ </head>
+ <body>
+  <p>This is an article</p>
+ </body>
+</html>
+HTM;
+
+    protected static $htmlWithWebmentionOrg = <<<HTM
+<html>
+ <head>
+  <title>article</title>
+  <link rel="http://webmention.org/" href="http://example.org/article-webmention-server" />
  </head>
  <body>
   <p>This is an article</p>
@@ -69,7 +97,7 @@ HTM;
         $this->client->setRequest($req);
     }
 
-    public function testSend()
+    public function testSendPingback()
     {
         //HEAD request
         $this->mock->addResponse(
@@ -96,6 +124,36 @@ HTM;
         $this->assertNull($res->getCode());
         $this->assertEquals(
             'Pingback received and processed', $res->getMessage()
+        );
+    }
+
+    public function testSendWebmention()
+    {
+        //HEAD request
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "Foo: bar\r\n"
+            . "Link: <http://example.org/webmention-server>; rel=\"webmention\"\r\n"
+            . "Bar: foo\r\n",
+            'http://example.org/article'
+        );
+        //pingback request
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "Content-Type: application/json\r\n"
+            . "\r\n"
+            . static::$jsonWebmention,
+            'http://example.org/webmention-server'
+        );
+
+        $res = $this->client->send(
+            'http://example.org/source',
+            'http://example.org/article'
+        );
+        $this->assertFalse($res->isError());
+        $this->assertNull($res->getCode());
+        $this->assertEquals(
+            'Webmention received and processed', $res->getMessage()
         );
     }
 
@@ -154,8 +212,9 @@ HTM;
         $res = $this->client->discoverServer(
             'http://example.org/article'
         );
-        $this->assertInternalType('string', $res);
-        $this->assertEquals('http://example.org/pingback-server', $res);
+        $this->assertInstanceOf('PEAR2\Services\Pingback\Server\Info', $res);
+        $this->assertEquals('http://example.org/pingback-server', $res->uri);
+        $this->assertEquals('pingback', $res->type);
     }
 
     public function testDiscoverServerGetInvalid()
@@ -186,7 +245,7 @@ HTM;
         );
     }
 
-    public function testDiscoverServerHead()
+    public function testDiscoverServerHeadPingback()
     {
         //HEAD request
         $this->mock->addResponse(
@@ -200,11 +259,12 @@ HTM;
         $res = $this->client->discoverServer(
             'http://example.org/article'
         );
-        $this->assertInternalType('string', $res);
-        $this->assertEquals('http://example.org/pingback-server', $res);
+        $this->assertInstanceOf('PEAR2\Services\Pingback\Server\Info', $res);
+        $this->assertEquals('http://example.org/pingback-server', $res->uri);
+        $this->assertEquals('pingback', $res->type);
     }
 
-    public function testDiscoverServerHeadInvalid()
+    public function testDiscoverServerHeadPingbackInvalid()
     {
         $this->mock->addResponse(
             "HTTP/1.0 200 OK\r\n"
@@ -222,6 +282,48 @@ HTM;
         $this->assertEquals(States::INVALID_URI, $res->getCode());
         $this->assertEquals(
             'HEAD X-Pingback server URI invalid: /path/to/pingback-server',
+            $res->getMessage()
+        );
+    }
+
+    public function testDiscoverServerHeadWebmention()
+    {
+        //HEAD request
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "Foo: bar\r\n"
+            . "Link: <http://example.org/webmention-server>; rel=\"webmention\"\r\n"
+            . "Bar: foo\r\n",
+            'http://example.org/article'
+        );
+
+        $res = $this->client->discoverServer(
+            'http://example.org/article'
+        );
+        $this->assertInstanceOf('PEAR2\Services\Pingback\Server\Info', $res);
+        $this->assertEquals('http://example.org/webmention-server', $res->uri);
+        $this->assertEquals('webmention', $res->type);
+    }
+
+    public function testDiscoverServerHeadWebmentionInvalid()
+    {
+        //HEAD request
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "Foo: bar\r\n"
+            . "Link: </webmention-server>; rel=\"webmention\"\r\n"
+            . "Bar: foo\r\n",
+            'http://example.org/article'
+        );
+
+        $res = $this->client->discoverServer(
+            'http://example.org/article'
+        );
+        $this->assertInstanceOf('\PEAR2\Services\Pingback\Response\Ping', $res);
+        $this->assertTrue($res->isError());
+        $this->assertEquals(States::INVALID_URI, $res->getCode());
+        $this->assertEquals(
+            'HEAD Link webmention server URI invalid: /webmention-server',
             $res->getMessage()
         );
     }
@@ -245,8 +347,9 @@ HTM;
         $res = $this->client->discoverServer(
             'http://example.org/article'
         );
-        $this->assertInternalType('string', $res);
-        $this->assertEquals('http://example.org/pingback-server', $res);
+        $this->assertInstanceOf('PEAR2\Services\Pingback\Server\Info', $res);
+        $this->assertEquals('http://example.org/pingback-server', $res->uri);
+        $this->assertEquals('pingback', $res->type);
     }
 
     public function testDiscoverServerTargetUriNotFoundHead()
@@ -327,7 +430,7 @@ HTM;
         $this->assertEquals(404, $res->getResponse()->getStatus());
     }
 
-    public function testDiscoverServerHtml()
+    public function testDiscoverServerHtmlPingback()
     {
         $this->mock->addResponse(
             "HTTP/1.0 200 OK\r\n"
@@ -344,8 +447,53 @@ HTM;
         $res = $this->client->discoverServer(
             'http://example.org/article'
         );
-        $this->assertInternalType('string', $res);
-        $this->assertEquals('http://example.org/article-pingback-server', $res);
+        $this->assertInstanceOf('PEAR2\Services\Pingback\Server\Info', $res);
+        $this->assertEquals('http://example.org/article-pingback-server', $res->uri);
+        $this->assertEquals('pingback', $res->type);
+    }
+
+    public function testDiscoverServerHtmlWebmention()
+    {
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "\r\n",
+            'http://example.org/article'
+        );
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "\r\n"
+            . static::$htmlWithWebmention,
+            'http://example.org/article'
+        );
+
+        $res = $this->client->discoverServer(
+            'http://example.org/article'
+        );
+        $this->assertInstanceOf('PEAR2\Services\Pingback\Server\Info', $res);
+        $this->assertEquals('http://example.org/article-webmention-server', $res->uri);
+        $this->assertEquals('webmention', $res->type);
+    }
+
+    public function testDiscoverServerHtmlWebmentionOrg()
+    {
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "\r\n",
+            'http://example.org/article'
+        );
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "\r\n"
+            . static::$htmlWithWebmentionOrg,
+            'http://example.org/article'
+        );
+
+        $res = $this->client->discoverServer(
+            'http://example.org/article'
+        );
+        $this->assertInstanceOf('PEAR2\Services\Pingback\Server\Info', $res);
+        $this->assertEquals('http://example.org/article-webmention-server', $res->uri);
+        $this->assertEquals('webmention', $res->type);
     }
 
     public function testDiscoverServerHtmlInvalid()
@@ -369,7 +517,7 @@ HTM;
         $this->assertTrue($res->isError());
         $this->assertEquals(States::INVALID_URI, $res->getCode());
         $this->assertEquals(
-            'HTML link pingback server URI invalid: /path/to/pingback-server',
+            'HTML head link server URI invalid',
             $res->getMessage()
         );
     }

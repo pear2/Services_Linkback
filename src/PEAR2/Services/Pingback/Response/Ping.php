@@ -110,6 +110,71 @@ class Ping
     }
 
     /**
+     * Uses a webmention HTTP response object to set the internal variables.
+     *
+     * @param object  $res   Webmention HTTP response object
+     * @param boolean $debug If debugging is enabled. If true, the response is
+     *                       kept in this object
+     *
+     * @return void
+     */
+    public function loadFromWebmentionResponse(
+        HTTP_Request2_Response $res, $debug = false
+    ) {
+        if ($debug) {
+            $this->setResponse($res);
+        }
+
+        if (intval($res->getStatus() / 100) != 2) {
+            $this->code    = States::HTTP_STATUS;
+            $this->message = 'Pingback answer HTTP status code is not 2xx but '
+                . $res->getStatus();
+        } else {
+            //no error, all fine
+            $this->code = null;
+            $this->message = null;
+        }
+        if (!$res->getHeader('content-type') == 'application/json') {
+            return;
+        }
+
+        $json = json_decode($res->getBody());
+        if ($json === false && $json === null) {
+            //broken json
+            return;
+        }
+
+        if (isset($json->error)) {
+            switch ($json->error) {
+            case 'source_not_found':
+                $this->code = States::SOURCE_URI_NOT_FOUND;
+                break;
+            case 'target_not_found':
+                $this->code = States::TARGET_URI_NOT_FOUND;
+                break;
+            case 'target_not_supported':
+                $this->code = States::PINGBACK_UNSUPPORTED;
+                break;
+            case 'no_link_found':
+                $this->code = States::NO_LINK_IN_SOURCE;
+                break;
+            case 'already_registered':
+                $this->code = States::ALREADY_REGISTERED;
+                break;
+            }
+
+            if (isset($json->error_description)) {
+                $this->message = (string) $json->error_description;
+            }
+        } else {
+            //no error
+            if (isset($json->result)) {
+                $this->message = (string) $json->result;
+            }
+        }
+    }
+
+    /**
      * Tells you if a response is an error or not
      *
      * @return boolean True if the request failed

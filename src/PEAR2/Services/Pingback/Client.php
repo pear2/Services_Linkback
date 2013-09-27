@@ -90,15 +90,18 @@ class Client
             );
         }
 
-        $serverUri = $this->discoverServer($targetUri);
-        if (is_object($serverUri) && $serverUri instanceof Response\Ping) {
+        $serverInfo = $this->discoverServer($targetUri);
+        if ($serverInfo instanceof Response\Ping) {
             if ($this->debug) {
-                $serverUri->setResponse($this->debugResponse);
+                $serverInfo->setResponse($this->debugResponse);
             }
-            return $serverUri;
+            return $serverInfo;
         }
 
-        return $this->sendPingback($serverUri, $sourceUri, $targetUri);
+        if ($serverInfo->type == 'pingback') {
+            return $this->sendPingback($serverInfo, $sourceUri, $targetUri);
+        }
+        return $this->sendWebmention($serverInfo, $sourceUri, $targetUri);
     }
 
     /**
@@ -106,9 +109,9 @@ class Client
      *
      * @param string $targetUri Some URL to discover the pingback server of
      *
-     * @return string|Response\Ping Server URI on success, Ping response object
-     *                              on failure. Response object has debug
-     *                              response not set.
+     * @return Server\Info|Response\Ping Server info on success, Ping response object
+     *                                   on failure. Response object has debug
+     *                                   response not set.
      */
     public function discoverServer($targetUri)
     {
@@ -129,6 +132,22 @@ class Client
             );
         }
 
+        //webmention link header
+        $links = (array) $res->getHeader('Link');
+        foreach ($links as $link) {
+            if (preg_match('#^<([^>]+)>; rel="webmention"$#', $link, $matches)) {
+                $uri = $matches[1];
+                if (!$this->urlValidator->validate($uri)) {
+                    return new Response\Ping(
+                        'HEAD Link webmention server URI invalid: ' . $uri,
+                        States::INVALID_URI
+                    );
+                }
+                return new Server\Info('webmention', $uri);
+            }
+        }
+
+        //pingback url header
         $headerUri = $res->getHeader('X-Pingback');
         if ($headerUri !== null) {
             if (!$this->urlValidator->validate($headerUri)) {
@@ -137,7 +156,7 @@ class Client
                     States::INVALID_URI
                 );
             }
-            return $headerUri;
+            return new Server\Info('pingback', $headerUri);
         }
 
         //HEAD failed, do a normal GET
@@ -161,54 +180,78 @@ class Client
                     States::INVALID_URI
                 );
             }
-            return $headerUri;
+            return new Server\Info('pingback', $headerUri);
         }
 
         $body = $res->getBody();
-        $regex = '#<link rel="pingback" href="([^"]+)" ?/?>#';
-        if (preg_match($regex, $body, $matches) == 0) {
-            //target resource is not pingback enabled
+        $doc = DomLoader::load($body, $res);
+
+        $xpath = new \DOMXPath($doc);
+        $xpath->registerNamespace('h', 'http://www.w3.org/1999/xhtml');
+
+        $nodeList = $xpath->query(
+            '/*[self::html or self::h:html]'
+            . '/*[self::head or self::h:head]'
+            . '/*[(self::link or self::h:link)'
+            . ' and ('
+            . '@rel="webmention" or @rel="http://webmention.org/"'
+            . ' or @rel="pingback"'
+            . ')'
+            . ']'
+        );
+
+        if ($nodeList->length == 0) {
+            //target resource is not pingback/webmention enabled
             return new Response\Ping(
                 'No pingback server found for URI',
                 States::PINGBACK_UNSUPPORTED
             );
         }
 
-        $uri = $matches[1];
-        $uri = str_replace(
-            array('&amp;', '&lt;', '&gt;', '&quot;'),
-            array('&', '<', '>', '"'),
-            $uri
-        );
+        $arLinks = array();
+        foreach ($nodeList as $link) {
+            $uri  = $link->attributes->getNamedItem('href')->nodeValue;
+            $type = $link->attributes->getNamedItem('rel')->nodeValue;
+            if ($type == 'http://webmention.org/') {
+                $type = 'webmention';
+            }
+            if ($this->urlValidator->validate($uri)) {
+                $arLinks[$type] = $uri;
+            }
+        }
 
-        if (!$this->urlValidator->validate($uri)) {
+        if (count($arLinks) == 0) {
             return new Response\Ping(
-                'HTML link pingback server URI invalid: ' . $uri,
-                States::INVALID_URI
+                'HTML head link server URI invalid', States::INVALID_URI
             );
         }
 
-        return $uri;
+        if (isset($arLinks['webmention'])) {
+            return new Server\Info('webmention', $arLinks['webmention']);
+        }
+
+        return new Server\Info('pingback', $arLinks['pingback']);
     }
 
     /**
      * Contacts the given pingback server and tells him that source links to
      * target.
      *
-     * @param string $serverUri URL of XML-RPC server that implements pingback
-     * @param string $sourceUri URL on this side, it links to $targetUri
-     * @param string $targetUri Remote URL that shall be notified about source
+     * @param object $serverInfo Information about the server that implements
+     *                           pingback
+     * @param string $sourceUri  URL on this side, it links to $targetUri
+     * @param string $targetUri  Remote URL that shall be notified about source
      *
      * @return Response\Ping Pingback response object containing all error
      *                       and status information.
      */
-    protected function sendPingback($serverUri, $sourceUri, $targetUri)
+    protected function sendPingback(Server\Info $serverInfo, $sourceUri, $targetUri)
     {
         $encSourceUri = htmlspecialchars($sourceUri);
         $encTargetUri = htmlspecialchars($targetUri);
 
         $req = $this->getRequest();
-        $req->setUrl($serverUri)
+        $req->setUrl($serverInfo->uri)
             ->setMethod(HTTP_Request2::METHOD_POST)
             ->setHeader('Content-type: text/xml')
             ->setBody(
@@ -227,6 +270,33 @@ XML
 
         $pres = new Response\Ping();
         $pres->loadFromPingbackResponse($res, $this->debug);
+        return $pres;
+    }
+
+    /**
+     * Contacts the given webmention server and tells him that source links to
+     * target.
+     *
+     * @param object $serverInfo Information about the server that implements
+     *                           webmention
+     * @param string $sourceUri  URL on this side, it links to $targetUri
+     * @param string $targetUri  Remote URL that shall be notified about source
+     *
+     * @return Response\Ping Pingback response object containing all error
+     *                       and status information.
+     */
+    protected function sendWebmention(Server\Info $serverInfo, $sourceUri, $targetUri)
+    {
+        $req = $this->getRequest();
+        $req->setUrl($serverInfo->uri)
+            ->setMethod(HTTP_Request2::METHOD_POST)
+            ->setHeader('Accept: application/json;q=0.9, */*;q=0.1')
+            ->addPostParameter('source', $sourceUri)
+            ->addPostParameter('target', $targetUri);
+        $res = $req->send();
+
+        $pres = new Response\Ping();
+        $pres->loadFromWebmentionResponse($res, $this->debug);
         return $pres;
     }
 

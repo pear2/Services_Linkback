@@ -27,6 +27,9 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $this->streamVarRegistered = true;
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testRunNotEnoughParameters()
     {
         $this->setXml(
@@ -52,6 +55,9 @@ XML
         );
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testRunWrongMethod()
     {
         $this->setXml(
@@ -78,6 +84,9 @@ XML
         );
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testRunOk()
     {
         $this->setXml(

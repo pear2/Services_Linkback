@@ -34,11 +34,6 @@ class States
     const CONTENT_TYPE = 101;
 
     /**
-     * Invalid callback type detected (not webmention or pingback)
-     */
-    const SERVER_TYPE = 102;
-
-    /**
      * Server callback object is invalid
      */
     const CALLBACK_INVALID = 150;

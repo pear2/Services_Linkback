@@ -49,6 +49,13 @@ class Server
     protected $responder;
 
     /**
+     * Responder used to send out webmention responses
+     *
+     * @var Server\Responder\Webmention
+     */
+    protected $webmentionResponder;
+
+    /**
      * Registered callbacks of all types.
      *
      * @var array
@@ -81,6 +88,15 @@ class Server
      */
     public function run()
     {
+        if (isset($_POST['source']) && isset($_POST['target'])) {
+            //webmention
+            $res = $this->handleRequest($_POST['source'], $_POST['target']);
+            $resp = $this->getWebmentionResponder();
+            $resp->send($res);
+            return;
+        }
+
+        //pingback
         $post = file_get_contents($this->getInputFile());
 
         $xs = xmlrpc_server_create();
@@ -116,6 +132,20 @@ class Server
         $sourceUri = $params[0];
         $targetUri = $params[1];
 
+        return $this->handleRequest($sourceUri, $targetUri);
+    }
+
+    /**
+     * Handle a request with source and target URI
+     *
+     * @param string $sourceUri URL linking to $targetUri
+     * @param string $targetUri Target URI that got linked to
+     *
+     * @return mixed Array of return values ('faultCode' and 'faultString'),
+     *               or single string if all is fine
+     */
+    protected function handleRequest($sourceUri, $targetUri)
+    {
         if (!$this->urlValidator->validate($sourceUri)) {
             return array(
                 'faultCode'   => States::INVALID_URI,
@@ -199,6 +229,32 @@ class Server
             $this->responder = new Server\Responder();
         }
         return $this->responder;
+    }
+
+    /**
+     * Set a webmention responder object
+     *
+     * @param object $responder Server webmention responder object
+     *
+     * @return self
+     */
+    public function setWebmentionResponder(Server\Responder\Webmention $responder)
+    {
+        $this->webmentionResponder = $responder;
+        return $this;
+    }
+
+    /**
+     * Get (and perhaps create) responder object.
+     *
+     * @return Server\Responder\Webmention Responder object
+     */
+    public function getWebmentionResponder()
+    {
+        if ($this->webmentionResponder === null) {
+            $this->webmentionResponder = new Server\Responder\Webmention();
+        }
+        return $this->webmentionResponder;
     }
 
     /**

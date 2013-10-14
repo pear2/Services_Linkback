@@ -129,7 +129,7 @@ Customizable and unit-tested Pingback client and server implementation.
    <package>
     <name>HTTP2</name>
     <channel>pear.php.net</channel>
-    <min>0.1.0</min>
+    <min>1.1.0</min>
    </package>
    <package>
     <name>Net_URL2</name>

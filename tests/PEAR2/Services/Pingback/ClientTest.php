@@ -150,7 +150,7 @@ HTM;
             'http://example.org/source',
             'http://example.org/article'
         );
-        $this->assertFalse($res->isError());
+        $this->assertFalse($res->isError(), 'Response should not be an error');
         $this->assertNull($res->getCode());
         $this->assertEquals(
             'Webmention received and processed', $res->getMessage()

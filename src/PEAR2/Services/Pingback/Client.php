@@ -14,8 +14,8 @@ namespace PEAR2\Services\Pingback;
 use HTTP_Request2;
 
 /**
- * Pingback client, allowing you to send pingbacks to remote sites
- * to tell them that you linked to them.
+ * Linkback client, allowing you to send pingbacks and webmentions
+ * to remote sites to tell them that you linked to them.
  *
  * @category Services
  * @package  PEAR2\Services\Pingback
@@ -40,7 +40,7 @@ class Client
     protected $debug = false;
 
     /**
-     * Full response of the pingback request, helpful for debugging
+     * Full response of the linkback request, helpful for debugging
      * in some error conditions.
      * Gets set when $debug is enabled
      *
@@ -56,7 +56,9 @@ class Client
     protected $urlValidator;
 
 
-
+    /**
+     * Initialize URL validator
+     */
     public function __construct()
     {
         $this->urlValidator = new Url();
@@ -64,8 +66,9 @@ class Client
 
 
     /**
-     * Send a pingback, indicating a link from source to target.
-     * The target's pingback server will be discovered automatically.
+     * Send a linkback (webmention or pingback), indicating a link from
+     * source to target.
+     * The target's linkback server will be discovered automatically.
      *
      * @param string $sourceUri URL on this side, it links to $targetUri
      * @param string $targetUri Remote URL that shall be notified about source
@@ -105,9 +108,9 @@ class Client
     }
 
     /**
-     * Autodiscover the pingback server for the given URI.
+     * Autodiscover the linkback server for the given URI.
      *
-     * @param string $targetUri Some URL to discover the pingback server of
+     * @param string $targetUri Some URL to discover the linkback server of
      *
      * @return Server\Info|Response\Ping Server info on success, Ping response object
      *                                   on failure. Response object has debug
@@ -133,17 +136,21 @@ class Client
         }
 
         //webmention link header
-        $links = (array) $res->getHeader('Link');
+        $http = new \HTTP2();
+        $links = $http->parseLinks($res->getHeader('Link'));
         foreach ($links as $link) {
-            if (preg_match('#^<([^>]+)>; rel="webmention"$#', $link, $matches)) {
-                $uri = $matches[1];
-                if (!$this->urlValidator->validate($uri)) {
+            if (isset($link['_uri']) && isset($link['rel'])
+                && (array_search('webmention', $link['rel']) !== false
+                || array_search('http://webmention.org/', $link['rel']) !== false)
+            ) {
+                if (!$this->urlValidator->validate($link['_uri'])) {
                     return new Response\Ping(
-                        'HEAD Link webmention server URI invalid: ' . $uri,
+                        'HEAD Link webmention server URI invalid: '
+                        . $link['_uri'],
                         States::INVALID_URI
                     );
                 }
-                return new Server\Info('webmention', $uri);
+                return new Server\Info('webmention', $link['_uri']);
             }
         }
 
@@ -285,8 +292,9 @@ XML
      * @return Response\Ping Pingback response object containing all error
      *                       and status information.
      */
-    protected function sendWebmention(Server\Info $serverInfo, $sourceUri, $targetUri)
-    {
+    protected function sendWebmention(
+        Server\Info $serverInfo, $sourceUri, $targetUri
+    ) {
         $req = $this->getRequest();
         $req->setUrl($serverInfo->uri)
             ->setMethod(HTTP_Request2::METHOD_POST)

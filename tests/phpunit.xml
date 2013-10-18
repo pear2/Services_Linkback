@@ -1,4 +1,4 @@
-<phpunit strict="true" colors="true" bootstrap="bootstrap.php">
+<phpunit strict="true" colors="true" bootstrap="bootstrap.php" backupGlobals="true">
  <php>
   <includePath>../src/</includePath>
  </php>

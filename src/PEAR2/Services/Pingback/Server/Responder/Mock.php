@@ -28,7 +28,14 @@ class Mock extends \PEAR2\Services\Pingback\Server\Responder
      *
      * @var string
      */
-    public $xml;
+    public $content;
+
+    /**
+     * Array with header lines
+     *
+     * @var array
+     */
+    public $header = array();
 
     /**
      * Stores the xml response
@@ -37,9 +44,21 @@ class Mock extends \PEAR2\Services\Pingback\Server\Responder
      *
      * @return void
      */
-    public function send($xml)
+    public function sendOutput($content)
     {
-        $this->xml = $xml;
+        $this->content = $content;
+    }
+
+    /**
+     * Store the header line
+     *
+     * @param string $line Single header line
+     *
+     * @return void
+     */
+    public function sendHeader($line)
+    {
+        $this->header[] = $line;
     }
 }
 

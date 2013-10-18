@@ -10,6 +10,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
     {
         $this->server = new Server();
         $this->server->setResponder(new Server\Responder\Mock());
+        $this->server->setWebmentionResponder(new Server\Responder\Webmention\Mock());
     }
 
     public function tearDown()
@@ -30,7 +31,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
     /**
      * @runInSeparateProcess
      */
-    public function testRunNotEnoughParameters()
+    public function testRunPingbackNotEnoughParameters()
     {
         $this->setXml(
             <<<XML
@@ -47,18 +48,18 @@ XML
         $this->server->run();
         $this->assertContains(
             'faultCode',
-            $this->server->getResponder()->xml
+            $this->server->getResponder()->content
         );
         $this->assertContains(
             '2 parameters required',
-            $this->server->getResponder()->xml
+            $this->server->getResponder()->content
         );
     }
 
     /**
      * @runInSeparateProcess
      */
-    public function testRunWrongMethod()
+    public function testRunPingbackWrongMethod()
     {
         $this->setXml(
             <<<XML
@@ -76,18 +77,18 @@ XML
         $this->server->run();
         $this->assertContains(
             'faultCode',
-            $this->server->getResponder()->xml
+            $this->server->getResponder()->content
         );
         $this->assertContains(
             'method not found',
-            $this->server->getResponder()->xml
+            $this->server->getResponder()->content
         );
     }
 
     /**
      * @runInSeparateProcess
      */
-    public function testRunOk()
+    public function testRunPingbackOk()
     {
         $this->setXml(
             <<<XML
@@ -119,8 +120,147 @@ XML
 </methodResponse>
 XML
             ,
-            $this->server->getResponder()->xml
+            $this->server->getResponder()->content
         );
+    }
+
+    public function testRunUnknownFormat()
+    {
+        $this->server->run();
+        $res = $this->server->getResponder();
+        $this->assertContains(
+            'HTTP/1.0 400 Bad Request', $res->header
+        );
+    }
+
+    public function testRunWebmentionOkJson()
+    {
+        $_POST['source'] = 'http://127.0.0.1/source';
+        $_POST['target'] = 'http://127.0.0.1/target';
+        $_SERVER['HTTP_ACCEPT'] = 'application/json';
+
+        $mockSource = new Server\Callback\FetchSource\Mock();
+        $mockSource->setResponse(new \HTTP_Request2_Response('HTTP/1.0 200 OK'));
+        $mockLink = new Server\Callback\LinkExists\Mock();
+        $mockLink->setLinkExists(true);
+
+        $this->server->setCallbacks(array($mockSource, $mockLink));
+        $this->server->run();
+
+        $resp = $this->server->getWebmentionResponder();
+        $this->assertContains(
+            'Content-type: application/json; charset=utf-8',
+            $resp->header
+        );
+        $this->assertEquals(
+            (object) array(
+                'result' => 'Pingback received and processed'
+            ),
+            json_decode($resp->content)
+        );
+    }
+
+    public function testRunWebmentionOkHtml()
+    {
+        $_POST['source'] = 'http://127.0.0.1/source';
+        $_POST['target'] = 'http://127.0.0.1/target';
+        $_SERVER['HTTP_ACCEPT'] = 'application/xhtml+xml';
+
+        $mockSource = new Server\Callback\FetchSource\Mock();
+        $mockSource->setResponse(new \HTTP_Request2_Response('HTTP/1.0 200 OK'));
+        $mockLink = new Server\Callback\LinkExists\Mock();
+        $mockLink->setLinkExists(true);
+
+        $this->server->setCallbacks(array($mockSource, $mockLink));
+        $this->server->run();
+
+        $resp = $this->server->getWebmentionResponder();
+        $this->assertContains(
+            'Content-type: application/xhtml+xml; charset=utf-8',
+            $resp->header
+        );
+        $this->assertContains(
+            'Pingback received and processed',
+            $resp->content
+        );
+    }
+
+    public function testRunWebmentionOkUnacceptable()
+    {
+        $_POST['source'] = 'http://127.0.0.1/source';
+        $_POST['target'] = 'http://127.0.0.1/target';
+
+        $mockSource = new Server\Callback\FetchSource\Mock();
+        $mockSource->setResponse(new \HTTP_Request2_Response('HTTP/1.0 200 OK'));
+        $mockLink = new Server\Callback\LinkExists\Mock();
+        $mockLink->setLinkExists(true);
+
+        $this->server->setCallbacks(array($mockSource, $mockLink));
+        $this->server->run();
+
+        $resp = $this->server->getWebmentionResponder();
+        $this->assertContains(
+            'HTTP/1.1 406 Not Acceptable',
+            $resp->header
+        );
+        $this->assertContains(
+            'You don\'t want any of the content types I have to offer',
+            $resp->content
+        );
+    }
+
+    public function testRunWebmentionErrorNoSourceJson()
+    {
+        $_POST['source'] = 'http://127.0.0.1/source';
+        $_POST['target'] = 'http://127.0.0.1/target';
+        $_SERVER['HTTP_ACCEPT'] = 'application/json';
+
+        $mockSource = new Server\Callback\FetchSource\Mock();
+        $mockSource->setResponse(new \HTTP_Request2_Response('HTTP/1.0 404 Not Found'));
+
+        $this->server->setCallbacks(array($mockSource));
+        $this->server->run();
+
+        $resp = $this->server->getWebmentionResponder();
+        $this->assertContains(
+            'HTTP/1.0 400 Bad Request',
+            $resp->header
+        );
+        $this->assertContains(
+            'Content-type: application/json; charset=utf-8',
+            $resp->header
+        );
+        $this->assertEquals(
+            (object) array(
+                'error' => 'source_not_found',
+                'error_description' => 'Source URI does not exist'
+            ),
+            json_decode($resp->content)
+        );
+    }
+
+    public function testRunWebmentionErrorNoSourceHtml()
+    {
+        $_POST['source'] = 'http://127.0.0.1/source';
+        $_POST['target'] = 'http://127.0.0.1/target';
+        $_SERVER['HTTP_ACCEPT'] = 'text/html';
+
+        $mockSource = new Server\Callback\FetchSource\Mock();
+        $mockSource->setResponse(new \HTTP_Request2_Response('HTTP/1.0 404 Not Found'));
+
+        $this->server->setCallbacks(array($mockSource));
+        $this->server->run();
+
+        $resp = $this->server->getWebmentionResponder();
+        $this->assertContains(
+            'HTTP/1.0 400 Bad Request',
+            $resp->header
+        );
+        $this->assertContains(
+            'Content-type: text/html; charset=utf-8',
+            $resp->header
+        );
+        $this->assertContains('Source URI does not exist', $resp->content);
     }
 
     public function testHandlePingbackPingSourceInvalid()
@@ -275,6 +415,15 @@ XML
         $resp = $server->getResponder();
         $this->assertInstanceOf(
             'PEAR2\Services\Pingback\Server\Responder', $resp
+        );
+    }
+
+    public function testGetWebmentionResponderNew()
+    {
+        $server = new Server();
+        $resp = $server->getWebmentionResponder();
+        $this->assertInstanceOf(
+            'PEAR2\Services\Pingback\Server\Responder\Webmention', $resp
         );
     }
 }

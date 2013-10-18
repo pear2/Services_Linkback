@@ -10,10 +10,11 @@
  * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link     http://pear2.php.net/package/Services_Pingback
  */
-namespace PEAR2\Services\Pingback\Server;
+namespace PEAR2\Services\Pingback\Server\Responder\Webmention;
+use PEAR2\Services\Pingback\Server\Responder\Webmention;
 
 /**
- * Sends HTTP headers and XML back to the client.
+ * Sends HTTP headers and a webmention result back to the client.
  *
  * @category Services
  * @package  PEAR2\Services\Pingback
@@ -21,25 +22,24 @@ namespace PEAR2\Services\Pingback\Server;
  * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link     http://pear2.php.net/package/Services_Pingback
  */
-class Responder
+class Mock extends Webmention
 {
     /**
-     * Send the given XML response back to the client.
-     * Sends the correct headers.
+     * Stored content from output()
      *
-     * @param string $xml XML response to send
-     *
-     * @return void
+     * @var string
      */
-    public function sendXml($xml)
-    {
-        $this->sendHeader('Content-type: text/xml; charset=utf-8');
-        $this->sendOutput($xml);
-    }
+    public $content;
 
     /**
-     * Output the given response back to the client.
-     * Does not send content-type header
+     * Array with header lines
+     *
+     * @var array
+     */
+    public $header = array();
+
+    /**
+     * Store the content to be outputted
      *
      * @param string $content Content to send
      *
@@ -47,11 +47,11 @@ class Responder
      */
     public function sendOutput($content)
     {
-        echo $content;
+        $this->content = $content;
     }
 
     /**
-     * Send a HTTP header line to the client.
+     * Store the header line
      *
      * @param string $line Single header line
      *
@@ -59,7 +59,7 @@ class Responder
      */
     public function sendHeader($line)
     {
-        header($line);
+        $this->header[] = $line;
     }
 }
 ?>

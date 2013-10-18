@@ -69,6 +69,26 @@ class Server
      */
     protected $urlValidator;
 
+    protected $unknownRequest = <<<XML
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+ <head>
+  <title>Linkback error</title>
+ </head>
+ <body>
+  <h1>Linkback error</h1>
+  <p>Cannot understand linkback request.</p>
+  <p>Expected input:</p>
+  <ul>
+   <li>Pingback: XML POST data</li>
+   <li>Webmention: <tt>source</tt> and <tt>target</tt> POST parameters</li>
+  </ul>
+ </body>
+</html>
+
+XML;
+
 
 
     /**
@@ -82,32 +102,38 @@ class Server
     }
 
     /**
-     * Run the pingback server and respond to the request.
+     * Run the linkback server and respond to the request.
      *
      * @return void
      */
     public function run()
     {
-        if (isset($_POST['source']) && isset($_POST['target'])) {
+        $post = file_get_contents($this->getInputFile());
+        if (substr($post, 0, 5) == '<?xml') {
+            //pingback
+            $xs = xmlrpc_server_create();
+            xmlrpc_server_register_method(
+                $xs, 'pingback.ping', array($this, 'handlePingbackPing')
+            );
+            $out = xmlrpc_server_call_method($xs, $post, null);
+
+            $resp = $this->getResponder();
+            $resp->sendHeader('HTTP/1.0 200 OK');
+            $resp->sendXml($out);
+
+        } else if (isset($_POST['source']) && isset($_POST['target'])) {
             //webmention
             $res = $this->handleRequest($_POST['source'], $_POST['target']);
             $resp = $this->getWebmentionResponder();
             $resp->send($res);
-            return;
+
+        } else {
+            //unknown
+            $resp = $this->getResponder();
+            $resp->sendHeader('HTTP/1.0 400 Bad Request');
+            $resp->sendHeader('Content-Type: text/html');
+            $resp->sendOutput($this->unknownRequest);
         }
-
-        //pingback
-        $post = file_get_contents($this->getInputFile());
-
-        $xs = xmlrpc_server_create();
-        xmlrpc_server_register_method(
-            $xs, 'pingback.ping', array($this, 'handlePingbackPing')
-        );
-        $out = xmlrpc_server_call_method($xs, $post, null);
-
-        $resp = $this->getResponder();
-        header('HTTP/1.0 200 OK');
-        $resp->send($out);
     }
 
     /**

@@ -63,9 +63,9 @@ XML;
     public function send($res)
     {
         if (is_array($res)) {
-            header('HTTP/1.0 400 Bad Request');
+            $this->sendHeader('HTTP/1.0 400 Bad Request');
         } else {
-            header('HTTP/1.0 202 Accepted');
+            $this->sendHeader('HTTP/1.0 202 Accepted');
         }
 
         $http = new \HTTP2();
@@ -76,11 +76,13 @@ XML;
 
         $type = $http->negotiateMimeType($supportedTypes, false);
         if ($type === false) {
-            header('HTTP/1.1 406 Not Acceptable');
-            echo "You don't want any of the content types I have to offer\n";
-            exit();
+            $this->sendHeader('HTTP/1.1 406 Not Acceptable');
+            $this->sendOutput(
+                "You don't want any of the content types I have to offer\n"
+            );
+            return;
         }
-        header('Content-type: ' . $type . '; charset=utf-8');
+        $this->sendHeader('Content-type: ' . $type . '; charset=utf-8');
 
         $json = $type == 'application/json';
         if (is_array($res)) {
@@ -93,20 +95,24 @@ XML;
     protected function sendError($json, $nCode, $message)
     {
         if ($json) {
-            echo json_encode(
-                (object) array(
-                    'error' => $this->getCodeName($nCode),
-                    'error_description' => $message
+            $this->sendOutput(
+                json_encode(
+                    (object) array(
+                        'error' => $this->getCodeName($nCode),
+                        'error_description' => $message
+                    )
                 )
             );
         } else {
-            echo str_replace(
-                array('%TITLE%', '%MESSAGE%'),
-                array(
-                    str_replace('_', ' ', $this->getCodeName($nCode)),
-                    $message
-                ),
-                self::$htmlTemplate
+            $this->sendOutput(
+                str_replace(
+                    array('%TITLE%', '%MESSAGE%'),
+                    array(
+                        str_replace('_', ' ', $this->getCodeName($nCode)),
+                        $message
+                    ),
+                    self::$htmlTemplate
+                )
             );
         }
     }
@@ -114,16 +120,20 @@ XML;
     protected function sendOk($json, $message)
     {
         if ($json) {
-            echo json_encode(
-                (object) array(
-                    'result' => $message
+            $this->sendOutput(
+                json_encode(
+                    (object) array(
+                        'result' => $message
+                    )
                 )
             );
         } else {
-            echo str_replace(
-                array('%TITLE%', '%MESSAGE%'),
-                array('All fine', $message),
-                self::$htmlTemplate
+            $this->sendOutput(
+                str_replace(
+                    array('%TITLE%', '%MESSAGE%'),
+                    array('All fine', $message),
+                    self::$htmlTemplate
+                )
             );
         }
     }
@@ -135,6 +145,30 @@ XML;
         }
         return 'unknown_error (' . $nCode . ')';
     }
-}
 
+    /**
+     * Output the given response back to the client.
+     * Does not send content-type header
+     *
+     * @param string $content Content to send
+     *
+     * @return void
+     */
+    public function sendOutput($content)
+    {
+        echo $content;
+    }
+
+    /**
+     * Send a HTTP header line to the client.
+     *
+     * @param string $line Single header line
+     *
+     * @return void
+     */
+    public function sendHeader($line)
+    {
+        header($line);
+    }
+}
 ?>

@@ -9,10 +9,10 @@ class ResponderTest extends \PHPUnit_Framework_TestCase
      * @runInSeparateProcess
      * @outputBuffering enabled
      */
-    public function testSend()
+    public function testSendOutput()
     {
         $resp = new Responder();
-        $resp->send('foo');
+        $resp->sendOutput('foo');
         //TODO: check for headers
         $this->expectOutputString('foo');
     }

@@ -197,7 +197,8 @@ HTM;
     {
         //HEAD request
         $this->mock->addResponse(
-            "HTTP/1.0 200 OK\r\n",
+            "HTTP/1.0 200 OK\r\n"
+            . "Content-type: text/html",
             'http://example.org/article'
         );
         //GET request
@@ -221,7 +222,8 @@ HTM;
     {
         //HEAD request
         $this->mock->addResponse(
-            "HTTP/1.0 200 OK\r\n",
+            "HTTP/1.0 200 OK\r\n"
+            . "Content-type: text/html",
             'http://example.org/article'
         );
         //GET request
@@ -389,6 +391,7 @@ HTM;
     {
         $this->mock->addResponse(
             "HTTP/1.0 200 OK\r\n"
+            . "Content-type: text/html\r\n"
             . "\r\n",
             'http://example.org/article'
         );
@@ -411,6 +414,7 @@ HTM;
     {
         $this->mock->addResponse(
             "HTTP/1.0 200 OK\r\n"
+            . "Content-type: text/html\r\n"
             . "\r\n",
             'http://example.org/article'
         );
@@ -434,6 +438,7 @@ HTM;
     {
         $this->mock->addResponse(
             "HTTP/1.0 200 OK\r\n"
+            . "Content-type: text/html\r\n"
             . "\r\n",
             'http://example.org/article'
         );
@@ -456,6 +461,7 @@ HTM;
     {
         $this->mock->addResponse(
             "HTTP/1.0 200 OK\r\n"
+            . "Content-type: text/html\r\n"
             . "\r\n",
             'http://example.org/article'
         );
@@ -478,6 +484,7 @@ HTM;
     {
         $this->mock->addResponse(
             "HTTP/1.0 200 OK\r\n"
+            . "Content-type: text/html\r\n"
             . "\r\n",
             'http://example.org/article'
         );
@@ -500,6 +507,7 @@ HTM;
     {
         $this->mock->addResponse(
             "HTTP/1.0 200 OK\r\n"
+            . "Content-type: text/html\r\n"
             . "\r\n",
             'http://example.org/article'
         );
@@ -524,11 +532,14 @@ HTM;
 
     public function testDiscoverServerHtmlNoServer()
     {
+        //HEAD
         $this->mock->addResponse(
             "HTTP/1.0 200 OK\r\n"
+            . "Content-type: text/html"
             . "\r\n",
             'http://example.org/article'
         );
+        //GET
         $this->mock->addResponse(
             "HTTP/1.0 200 OK\r\n"
             . "\r\n"
@@ -543,7 +554,7 @@ HTM;
         $this->assertTrue($res->isError());
         $this->assertEquals(States::PINGBACK_UNSUPPORTED, $res->getCode());
         $this->assertEquals(
-            'No pingback server found for URI', $res->getMessage()
+            'No linkback server found for URI', $res->getMessage()
         );
     }
 

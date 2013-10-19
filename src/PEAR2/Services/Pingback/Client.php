@@ -166,6 +166,17 @@ class Client
             return new Server\Info('pingback', $headerUri);
         }
 
+        $type = $res->getHeader('Content-type');
+        if ($type != 'text/html' && $type != 'text/xml'
+            && $type != 'application/xhtml+xml'
+            && $res->getStatus() != 405//method not allowed
+        ) {
+            return new Response\Ping(
+                'No linkback server found for URI (HEAD only)',
+                States::PINGBACK_UNSUPPORTED
+            );
+        }
+
         //HEAD failed, do a normal GET
         $req->setMethod(HTTP_Request2::METHOD_GET);
         $res = $req->send();
@@ -210,7 +221,7 @@ class Client
         if ($nodeList->length == 0) {
             //target resource is not pingback/webmention enabled
             return new Response\Ping(
-                'No pingback server found for URI',
+                'No linkback server found for URI',
                 States::PINGBACK_UNSUPPORTED
             );
         }

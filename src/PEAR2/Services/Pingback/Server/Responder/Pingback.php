@@ -13,7 +13,7 @@
 namespace PEAR2\Services\Pingback\Server\Responder;
 
 /**
- * Sends HTTP headers and XML back to the client.
+ * Sends pingback responses back to the client.
  *
  * @category Services
  * @package  PEAR2\Services\Pingback
@@ -21,45 +21,20 @@ namespace PEAR2\Services\Pingback\Server\Responder;
  * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link     http://pear2.php.net/package/Services_Pingback
  */
-class Mock extends Pingback
+class Pingback extends Base
 {
     /**
-     * XML that should be send out
-     *
-     * @var string
-     */
-    public $content;
-
-    /**
-     * Array with header lines
-     *
-     * @var array
-     */
-    public $header = array();
-
-    /**
-     * Stores the xml response
+     * Send the given XML response back to the client.
+     * Sends the correct headers.
      *
      * @param string $xml XML response to send
      *
      * @return void
      */
-    public function sendOutput($content)
+    public function sendXml($xml)
     {
-        $this->content = $content;
-    }
-
-    /**
-     * Store the header line
-     *
-     * @param string $line Single header line
-     *
-     * @return void
-     */
-    public function sendHeader($line)
-    {
-        $this->header[] = $line;
+        $this->sendHeader('Content-type: text/xml; charset=utf-8');
+        $this->sendOutput($xml);
     }
 }
-
 ?>

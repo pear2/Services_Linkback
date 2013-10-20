@@ -44,9 +44,9 @@ class Server
     /**
      * Responder used to send out header and XML data
      *
-     * @var Server\Responder
+     * @var Server\Responder\Pingback
      */
-    protected $responder;
+    protected $pingbackResponder;
 
     /**
      * Responder used to send out webmention responses
@@ -117,7 +117,7 @@ XML;
             );
             $out = xmlrpc_server_call_method($xs, $post, null);
 
-            $resp = $this->getResponder();
+            $resp = $this->getPingbackResponder();
             $resp->sendHeader('HTTP/1.0 200 OK');
             $resp->sendXml($out);
 
@@ -129,7 +129,7 @@ XML;
 
         } else {
             //unknown
-            $resp = $this->getResponder();
+            $resp = $this->getPingbackResponder();
             $resp->sendHeader('HTTP/1.0 400 Bad Request');
             $resp->sendHeader('Content-Type: text/html');
             $resp->sendOutput($this->unknownRequest);
@@ -238,23 +238,23 @@ XML;
      *
      * @return self
      */
-    public function setResponder(Server\Responder $responder)
+    public function setPingbackResponder(Server\Responder\Pingback $responder)
     {
-        $this->responder = $responder;
+        $this->pingbackResponder = $responder;
         return $this;
     }
 
     /**
      * Get (and perhaps create) responder object.
      *
-     * @return Server\Responder Responder object
+     * @return Server\Responder\Pingback Responder object
      */
-    public function getResponder()
+    public function getPingbackResponder()
     {
-        if ($this->responder === null) {
-            $this->responder = new Server\Responder();
+        if ($this->pingbackResponder === null) {
+            $this->pingbackResponder = new Server\Responder\Pingback();
         }
-        return $this->responder;
+        return $this->pingbackResponder;
     }
 
     /**

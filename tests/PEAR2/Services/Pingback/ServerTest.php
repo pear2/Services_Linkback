@@ -9,7 +9,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->server = new Server();
-        $this->server->setResponder(new Server\Responder\Mock());
+        $this->server->setPingbackResponder(new Server\Responder\Mock());
         $this->server->setWebmentionResponder(new Server\Responder\Webmention\Mock());
     }
 
@@ -48,11 +48,11 @@ XML
         $this->server->run();
         $this->assertContains(
             'faultCode',
-            $this->server->getResponder()->content
+            $this->server->getPingbackResponder()->content
         );
         $this->assertContains(
             '2 parameters required',
-            $this->server->getResponder()->content
+            $this->server->getPingbackResponder()->content
         );
     }
 
@@ -77,11 +77,11 @@ XML
         $this->server->run();
         $this->assertContains(
             'faultCode',
-            $this->server->getResponder()->content
+            $this->server->getPingbackResponder()->content
         );
         $this->assertContains(
             'method not found',
-            $this->server->getResponder()->content
+            $this->server->getPingbackResponder()->content
         );
     }
 
@@ -120,14 +120,14 @@ XML
 </methodResponse>
 XML
             ,
-            $this->server->getResponder()->content
+            $this->server->getPingbackResponder()->content
         );
     }
 
     public function testRunUnknownFormat()
     {
         $this->server->run();
-        $res = $this->server->getResponder();
+        $res = $this->server->getPingbackResponder();
         $this->assertContains(
             'HTTP/1.0 400 Bad Request', $res->header
         );
@@ -409,12 +409,12 @@ XML
         $this->server->verifyCallbacks(array(new \stdClass()));
     }
 
-    public function testGetResponderNew()
+    public function testGetPingbackResponderNew()
     {
         $server = new Server();
-        $resp = $server->getResponder();
+        $resp = $server->getPingbackResponder();
         $this->assertInstanceOf(
-            'PEAR2\Services\Pingback\Server\Responder', $resp
+            'PEAR2\Services\Pingback\Server\Responder\Pingback', $resp
         );
     }
 

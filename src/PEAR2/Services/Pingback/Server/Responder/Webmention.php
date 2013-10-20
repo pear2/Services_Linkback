@@ -22,7 +22,7 @@ use PEAR2\Services\Pingback\States;
  * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link     http://pear2.php.net/package/Services_Pingback
  */
-class Webmention
+class Webmention extends Base
 {
     protected static $htmlTemplate = <<<XML
 <?xml version="1.0" encoding="utf-8"?>
@@ -144,31 +144,6 @@ XML;
             return self::$arCodeNames[$nCode];
         }
         return 'unknown_error (' . $nCode . ')';
-    }
-
-    /**
-     * Output the given response back to the client.
-     * Does not send content-type header
-     *
-     * @param string $content Content to send
-     *
-     * @return void
-     */
-    public function sendOutput($content)
-    {
-        echo $content;
-    }
-
-    /**
-     * Send a HTTP header line to the client.
-     *
-     * @param string $line Single header line
-     *
-     * @return void
-     */
-    public function sendHeader($line)
-    {
-        header($line);
     }
 }
 ?>

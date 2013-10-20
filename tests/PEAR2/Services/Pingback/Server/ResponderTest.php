@@ -11,7 +11,7 @@ class ResponderTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendOutput()
     {
-        $resp = new Responder();
+        $resp = new Responder\Pingback();
         $resp->sendOutput('foo');
         //TODO: check for headers
         $this->expectOutputString('foo');

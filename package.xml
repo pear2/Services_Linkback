@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <package version="2.1" xmlns="http://pear.php.net/dtd/package-2.1" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0     http://pear.php.net/dtd/tasks-1.0.xsd     http://pear.php.net/dtd/package-2.1     http://pear.php.net/dtd/package-2.1.xsd">
- <name>Services_Pingback</name>
+ <name>Services_Linkback</name>
  <channel>pear2.php.net</channel>
- <summary>Pingback client and server implementation for PHP 5.3+.
+ <summary>Pingback+webmention client and server implementation for PHP 5.3+.
 </summary>
  <description>
-Customizable and unit-tested Pingback client and server implementation.
+Customizable and unit-tested Pingback and webmention client and server implementation.
 </description>
  <lead>
   <name>Christian Weiske</name>
@@ -41,7 +41,7 @@ Customizable and unit-tested Pingback client and server implementation.
    <dir name="src" baseinstalldir="/">
     <dir name="PEAR2">
      <dir name="Services">
-      <dir name="Pingback">
+      <dir name="Linkback">
        <dir name="Response">
         <file role="php" name="Ping.php"/>
        </dir>
@@ -86,7 +86,7 @@ Customizable and unit-tested Pingback client and server implementation.
    <dir name="tests" baseinstalldir="/">
     <dir name="PEAR2">
      <dir name="Services">
-      <dir name="Pingback">
+      <dir name="Linkback">
        <dir name="Response">
         <file role="test" name="PingTest.php"/>
        </dir>

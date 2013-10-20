@@ -1,8 +1,8 @@
 ***********************
-PEAR2 Services_Pingback
+PEAR2 Services_Linkback
 ***********************
 
-Pingback client and server implementation for PHP 5.3+.
+Pingback and webmention client and server implementation for PHP 5.3+.
 
 
 Glossary:
@@ -12,14 +12,14 @@ Glossary:
 
 
 ===============
-Pingback server
+Linkback server
 ===============
-The package provides a basic pingback server implementation that can be
+The package provides a basic pingback+webmention server implementation that can be
 customized easily via callbacks.
 
 Usage::
 
-    $srv = new \PEAR2\Services\Pingback\Server();
+    $srv = new \PEAR2\Services\Linkback\Server();
     $srv->addCallback(new PingbackLogger());
     $srv->run();
 
@@ -30,7 +30,7 @@ The server provides 4 types of callbacks to modify its behaviour.
 Each callback needs to implement one of the four interfaces:
 
 
-Services\Pingback\Server\Callback\ITarget
+Services\Linkback\Server\Callback\ITarget
 -----------------------------------------
 Verifies that the target URL exists in the local system.
 Useful to filter out pingbacks for non-existant URLs.
@@ -38,25 +38,25 @@ Useful to filter out pingbacks for non-existant URLs.
 FIXME: Default implementation
 
 
-Services\Pingback\Server\Callback\ISource
+Services\Linkback\Server\Callback\ISource
 -----------------------------------------
 Fetches the source URL for further verification.
 Used to determine if the source URL really exists.
 
-Services_Pingback provides the ``Services\Pingback\Server\Callback\FetchSource``
+Services_Pingback provides the ``Services\Linkback\Server\Callback\FetchSource``
 callback class that is automatically registered with the server.
 
 
-Services\Pingback\Server\Callback\ILink
+Services\Linkback\Server\Callback\ILink
 ---------------------------------------
 Verifies that the source URL content really links to the target URL.
 Used to filter out fake pingbacks that do not actually provide links.
 
-Services_Pingback provides the ``Services\Pingback\Server\Callback\LinkExists``
+Services_Pingback provides the ``Services\Linkback\Server\Callback\LinkExists``
 callback class that is automatically registered with the server.
 
 
-Services\Pingback\Server\Callback\IStorage
+Services\Linkback\Server\Callback\IStorage
 ------------------------------------------
 After all verifications have been done, the storage finally handles
 the pingback - it could e.g. log it to a file or a database.

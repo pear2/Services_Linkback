@@ -13,7 +13,7 @@ function __autoload($class) {
     include_once str_replace(array('_', '\\'), '/', $class) . '.php';
 }
 
-$c = new \PEAR2\Services\Pingback\Client();
+$c = new \PEAR2\Services\Linkback\Client();
 $c->setDebug(true);
 $r = $c->send($source, $target);
 

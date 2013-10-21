@@ -10,7 +10,10 @@ echo "Sending pingback from $source to $target\n";
 
 set_include_path(get_include_path() . PATH_SEPARATOR . __DIR__ . '/../src/');
 function __autoload($class) {
-    include_once str_replace(array('_', '\\'), '/', $class) . '.php';
+    $fileName = str_replace(array('_', '\\'), '/', $class) . '.php';
+    if (stream_resolve_include_path($fileName)) {
+        require_once $fileName;
+    }
 }
 
 $c = new \PEAR2\Services\Linkback\Client();

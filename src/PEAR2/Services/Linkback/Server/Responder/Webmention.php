@@ -71,30 +71,27 @@ XML;
         $http = new \HTTP2();
         $supportedTypes = array(
             'application/xhtml+xml', 'text/html',
-            'application/json'
+            'application/json',
+            'text/plain'
         );
 
-        $type = $http->negotiateMimeType($supportedTypes, false);
-        if ($type === false) {
-            $this->sendHeader('HTTP/1.1 406 Not Acceptable');
-            $this->sendOutput(
-                "You don't want any of the content types I have to offer\n"
-            );
-            return;
-        }
+        $type = $http->negotiateMimeType($supportedTypes, 'text/plain');
         $this->sendHeader('Content-type: ' . $type . '; charset=utf-8');
 
-        $json = $type == 'application/json';
+        $outputType = $type;
+        if ($outputType == 'application/xhtml+xml') {
+            $outputType = 'text/html';
+        }
         if (is_array($res)) {
-            $this->sendError($json, $res['faultCode'], $res['faultString']);
+            $this->sendError($outputType, $res['faultCode'], $res['faultString']);
         } else {
-            $this->sendOk($json, $res);
+            $this->sendOk($outputType, $res);
         }
     }
 
-    protected function sendError($json, $nCode, $message)
+    protected function sendError($type, $nCode, $message)
     {
-        if ($json) {
+        if ($type == 'application/json') {
             $this->sendOutput(
                 json_encode(
                     (object) array(
@@ -103,7 +100,7 @@ XML;
                     )
                 )
             );
-        } else {
+        } else if ($type == 'text/html') {
             $this->sendOutput(
                 str_replace(
                     array('%TITLE%', '%MESSAGE%'),
@@ -114,12 +111,18 @@ XML;
                     self::$htmlTemplate
                 )
             );
+        } else {
+            $this->sendOutput(
+                'Webmention error #' . $nCode . ': '
+                . str_replace('_', ' ', $this->getCodeName($nCode)) . "\n"
+                . $message . "\n"
+            );
         }
     }
 
-    protected function sendOk($json, $message)
+    protected function sendOk($type, $message)
     {
-        if ($json) {
+        if ($type == 'application/json') {
             $this->sendOutput(
                 json_encode(
                     (object) array(
@@ -127,13 +130,17 @@ XML;
                     )
                 )
             );
-        } else {
+        } else if ($type == 'text/html') {
             $this->sendOutput(
                 str_replace(
                     array('%TITLE%', '%MESSAGE%'),
                     array('All fine', $message),
                     self::$htmlTemplate
                 )
+            );
+        } else {
+            $this->sendOutput(
+                'OK. ' . $message . "\n"
             );
         }
     }

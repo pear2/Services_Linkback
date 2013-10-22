@@ -160,55 +160,6 @@ XML
         );
     }
 
-    public function testRunWebmentionOkHtml()
-    {
-        $_POST['source'] = 'http://127.0.0.1/source';
-        $_POST['target'] = 'http://127.0.0.1/target';
-        $_SERVER['HTTP_ACCEPT'] = 'application/xhtml+xml';
-
-        $mockSource = new Server\Callback\FetchSource\Mock();
-        $mockSource->setResponse(new \HTTP_Request2_Response('HTTP/1.0 200 OK'));
-        $mockLink = new Server\Callback\LinkExists\Mock();
-        $mockLink->setLinkExists(true);
-
-        $this->server->setCallbacks(array($mockSource, $mockLink));
-        $this->server->run();
-
-        $resp = $this->server->getWebmentionResponder();
-        $this->assertContains(
-            'Content-type: application/xhtml+xml; charset=utf-8',
-            $resp->header
-        );
-        $this->assertContains(
-            'Pingback received and processed',
-            $resp->content
-        );
-    }
-
-    public function testRunWebmentionOkUnacceptable()
-    {
-        $_POST['source'] = 'http://127.0.0.1/source';
-        $_POST['target'] = 'http://127.0.0.1/target';
-
-        $mockSource = new Server\Callback\FetchSource\Mock();
-        $mockSource->setResponse(new \HTTP_Request2_Response('HTTP/1.0 200 OK'));
-        $mockLink = new Server\Callback\LinkExists\Mock();
-        $mockLink->setLinkExists(true);
-
-        $this->server->setCallbacks(array($mockSource, $mockLink));
-        $this->server->run();
-
-        $resp = $this->server->getWebmentionResponder();
-        $this->assertContains(
-            'HTTP/1.1 406 Not Acceptable',
-            $resp->header
-        );
-        $this->assertContains(
-            'You don\'t want any of the content types I have to offer',
-            $resp->content
-        );
-    }
-
     public function testRunWebmentionErrorNoSourceJson()
     {
         $_POST['source'] = 'http://127.0.0.1/source';
@@ -237,30 +188,6 @@ XML
             ),
             json_decode($resp->content)
         );
-    }
-
-    public function testRunWebmentionErrorNoSourceHtml()
-    {
-        $_POST['source'] = 'http://127.0.0.1/source';
-        $_POST['target'] = 'http://127.0.0.1/target';
-        $_SERVER['HTTP_ACCEPT'] = 'text/html';
-
-        $mockSource = new Server\Callback\FetchSource\Mock();
-        $mockSource->setResponse(new \HTTP_Request2_Response('HTTP/1.0 404 Not Found'));
-
-        $this->server->setCallbacks(array($mockSource));
-        $this->server->run();
-
-        $resp = $this->server->getWebmentionResponder();
-        $this->assertContains(
-            'HTTP/1.0 400 Bad Request',
-            $resp->header
-        );
-        $this->assertContains(
-            'Content-type: text/html; charset=utf-8',
-            $resp->header
-        );
-        $this->assertContains('Source URI does not exist', $resp->content);
     }
 
     public function testHandlePingbackPingSourceInvalid()

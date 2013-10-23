@@ -25,6 +25,7 @@ $req->setConfig(
         'ssl_verify_host' => false
     )
 );
+$c->setRequestTemplate($req);
 $c->setDebug(true);
 $r = $c->send($source, $target);
 

@@ -118,7 +118,7 @@ HTM;
         $req->setAdapter($this->mock);
 
         $this->client = new Client();
-        $this->client->setRequest($req);
+        $this->client->setRequestTemplate($req);
     }
 
     public function testSendPingback()
@@ -643,16 +643,6 @@ HTM;
         $cl = new Client();
         $req = $cl->getRequest();
         $this->assertInstanceOf('\HTTP_Request2', $req);
-    }
-
-    public function testGetRequestSet()
-    {
-        $cl = new Client();
-        $req = $cl->getRequest();
-        $this->assertInstanceOf('\HTTP_Request2', $req);
-
-        $req2 = $cl->getRequest();
-        $this->assertSame($req, $req2);
     }
 }
 ?>

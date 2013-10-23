@@ -341,9 +341,10 @@ XML
     }
 
     /**
-     * Returns the HTTP request object that's used internally
+     * Returns the HTTP request object clone that can be used
+     * for one HTTP request.
      *
-     * @return HTTP_Request2
+     * @return HTTP_Request2 Clone of the setRequest() object
      */
     public function getRequest()
     {
@@ -353,9 +354,12 @@ XML
             $request->setConfig('follow_redirects', true);
             //keep POST on redirect
             $request->setConfig('strict_redirects', true);
-            $this->setRequest($request);
+            $this->setRequestTemplate($request);
         }
-        return $this->request;
+
+        //we need to clone because previous requests could have
+        //set internal variables like POST data that we don't want now
+        return clone $this->request;
     }
 
     /**
@@ -365,7 +369,7 @@ XML
      *
      * @return self
      */
-    public function setRequest(HTTP_Request2 $request)
+    public function setRequestTemplate(HTTP_Request2 $request)
     {
         $this->request = $request;
         return $this;

@@ -62,6 +62,30 @@ HTM;
 </html>
 HTM;
 
+    protected static $htmlWithWebmentionNo = <<<HTM
+<html>
+ <head>
+  <title>article</title>
+  <link rel="thisisnotwebmention" href="http://example.org/" />
+ </head>
+ <body>
+  <p>This is an article</p>
+ </body>
+</html>
+HTM;
+
+    protected static $htmlWithWebmentionMultiple = <<<HTM
+<html>
+ <head>
+  <title>article</title>
+  <link rel="webmention foo bar" href="http://example.org/article-webmention-server" />
+ </head>
+ <body>
+  <p>This is an article</p>
+ </body>
+</html>
+HTM;
+
     protected static $htmlWithInvalidPingback = <<<HTM
 <html>
  <head>
@@ -197,9 +221,7 @@ HTM;
     {
         //HEAD request
         $this->mock->addResponse(
-            "HTTP/1.0 200 OK\r\n"
-            . "Content-type: text/html",
-            'http://example.org/article'
+            "HTTP/1.0 405 Method not allowed\r\n", 'http://example.org/article'
         );
         //GET request
         $this->mock->addResponse(
@@ -222,9 +244,7 @@ HTM;
     {
         //HEAD request
         $this->mock->addResponse(
-            "HTTP/1.0 200 OK\r\n"
-            . "Content-type: text/html",
-            'http://example.org/article'
+            "HTTP/1.0 405 Method not allowed\r\n", 'http://example.org/article'
         );
         //GET request
         $this->mock->addResponse(
@@ -354,6 +374,25 @@ HTM;
         $this->assertEquals('pingback', $res->type);
     }
 
+    public function testDiscoverServerHeadWrongContentType()
+    {
+        //HEAD request
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "Content-Type: image/png\r\n",
+            'http://example.org/article'
+        );
+
+        $res = $this->client->discoverServer('http://example.org/article');
+        $this->assertInstanceOf('\PEAR2\Services\Linkback\Response\Ping', $res);
+        $this->assertTrue($res->isError());
+        $this->assertEquals(States::PINGBACK_UNSUPPORTED, $res->getCode());
+        $this->assertEquals(
+            'No linkback server found for URI (HEAD only)',
+            $res->getMessage()
+        );
+    }
+
     public function testDiscoverServerTargetUriNotFoundHead()
     {
         $this->mock->addResponse(
@@ -389,12 +428,12 @@ HTM;
 
     public function testDiscoverServerTargetUriNotFoundGet()
     {
+        //HEAD request
         $this->mock->addResponse(
-            "HTTP/1.0 200 OK\r\n"
-            . "Content-type: text/html\r\n"
-            . "\r\n",
+            "HTTP/1.0 405 Method not allowed\r\n",
             'http://example.org/article'
         );
+        //GET
         $this->mock->addResponse(
             "HTTP/1.0 404 Not Found\r\n",
             'http://example.org/article'
@@ -412,12 +451,12 @@ HTM;
 
     public function testSendTargetUriNotFoundGetDebug()
     {
+        //HEAD request
         $this->mock->addResponse(
-            "HTTP/1.0 200 OK\r\n"
-            . "Content-type: text/html\r\n"
-            . "\r\n",
+            "HTTP/1.0 405 Method not allowed\r\n",
             'http://example.org/article'
         );
+        //GET
         $this->mock->addResponse(
             "HTTP/1.0 404 Not Found\r\n",
             'http://example.org/article'
@@ -436,12 +475,11 @@ HTM;
 
     public function testDiscoverServerHtmlPingback()
     {
+        //HEAD request
         $this->mock->addResponse(
-            "HTTP/1.0 200 OK\r\n"
-            . "Content-type: text/html\r\n"
-            . "\r\n",
-            'http://example.org/article'
+            "HTTP/1.0 405 Method not allowed\r\n", 'http://example.org/article'
         );
+        //GET
         $this->mock->addResponse(
             "HTTP/1.0 200 OK\r\n"
             . "\r\n"
@@ -459,12 +497,11 @@ HTM;
 
     public function testDiscoverServerHtmlWebmention()
     {
+        //HEAD request
         $this->mock->addResponse(
-            "HTTP/1.0 200 OK\r\n"
-            . "Content-type: text/html\r\n"
-            . "\r\n",
-            'http://example.org/article'
+            "HTTP/1.0 405 Method not allowed\r\n", 'http://example.org/article'
         );
+        //GET
         $this->mock->addResponse(
             "HTTP/1.0 200 OK\r\n"
             . "\r\n"
@@ -482,12 +519,11 @@ HTM;
 
     public function testDiscoverServerHtmlWebmentionOrg()
     {
+        //HEAD request
         $this->mock->addResponse(
-            "HTTP/1.0 200 OK\r\n"
-            . "Content-type: text/html\r\n"
-            . "\r\n",
-            'http://example.org/article'
+            "HTTP/1.0 405 Method not allowed\r\n", 'http://example.org/article'
         );
+        //GET
         $this->mock->addResponse(
             "HTTP/1.0 200 OK\r\n"
             . "\r\n"
@@ -503,14 +539,61 @@ HTM;
         $this->assertEquals('webmention', $res->type);
     }
 
-    public function testDiscoverServerHtmlInvalid()
+    public function testDiscoverServerHtmlWebmentionMultiple()
     {
+        //HEAD request
+        $this->mock->addResponse(
+            "HTTP/1.0 405 Method not allowed\r\n", 'http://example.org/article'
+        );
+        //GET
         $this->mock->addResponse(
             "HTTP/1.0 200 OK\r\n"
-            . "Content-type: text/html\r\n"
-            . "\r\n",
+            . "\r\n"
+            . static::$htmlWithWebmentionMultiple,
             'http://example.org/article'
         );
+
+        $res = $this->client->discoverServer(
+            'http://example.org/article'
+        );
+        $this->assertInstanceOf('PEAR2\Services\Linkback\Server\Info', $res);
+        $this->assertEquals('http://example.org/article-webmention-server', $res->uri);
+        $this->assertEquals('webmention', $res->type);
+    }
+
+    public function testDiscoverServerHtmlWebmentionNone()
+    {
+        //HEAD request
+        $this->mock->addResponse(
+            "HTTP/1.0 405 Method not allowed\r\n", 'http://example.org/article'
+        );
+        //GET
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "\r\n"
+            . static::$htmlWithWebmentionNo,
+            'http://example.org/article'
+        );
+
+        $res = $this->client->discoverServer(
+            'http://example.org/article'
+        );
+        $this->assertInstanceOf('\PEAR2\Services\Linkback\Response\Ping', $res);
+        $this->assertTrue($res->isError());
+        $this->assertEquals(States::PINGBACK_UNSUPPORTED, $res->getCode());
+        $this->assertEquals(
+            'No linkback server found for URI',
+            $res->getMessage()
+        );
+    }
+
+    public function testDiscoverServerHtmlInvalid()
+    {
+        //HEAD request
+        $this->mock->addResponse(
+            "HTTP/1.0 405 Method not allowed\r\n", 'http://example.org/article'
+        );
+        //GET
         $this->mock->addResponse(
             "HTTP/1.0 200 OK\r\n"
             . "\r\n"
@@ -532,12 +615,9 @@ HTM;
 
     public function testDiscoverServerHtmlNoServer()
     {
-        //HEAD
+        //HEAD request
         $this->mock->addResponse(
-            "HTTP/1.0 200 OK\r\n"
-            . "Content-type: text/html"
-            . "\r\n",
-            'http://example.org/article'
+            "HTTP/1.0 405 Method not allowed\r\n", 'http://example.org/article'
         );
         //GET
         $this->mock->addResponse(

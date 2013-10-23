@@ -212,7 +212,8 @@ class Client
             . '/*[self::head or self::h:head]'
             . '/*[(self::link or self::h:link)'
             . ' and ('
-            . '@rel="webmention" or @rel="http://webmention.org/"'
+            . ' contains(concat(" ", normalize-space(@rel), " "), " webmention ")'
+            . ' or contains(concat(" ", normalize-space(@rel), " "), " http://webmention.org/ ")'
             . ' or @rel="pingback"'
             . ')'
             . ']'
@@ -229,12 +230,18 @@ class Client
         $arLinks = array();
         foreach ($nodeList as $link) {
             $uri  = $link->attributes->getNamedItem('href')->nodeValue;
-            $type = $link->attributes->getNamedItem('rel')->nodeValue;
-            if ($type == 'http://webmention.org/') {
-                $type = 'webmention';
+            $types = explode(
+                ' ', $link->attributes->getNamedItem('rel')->nodeValue
+            );
+            if (array_search('http://webmention.org/', $types) !== false) {
+                $types[] = 'webmention';
             }
             if ($this->urlValidator->validate($uri)) {
-                $arLinks[$type] = $uri;
+                foreach ($types as $type) {
+                    if ($type == 'webmention' || $type == 'pingback') {
+                        $arLinks[$type] = $uri;
+                    }
+                }
             }
         }
 
@@ -341,7 +348,10 @@ XML
     public function getRequest()
     {
         if ($this->request === null) {
-            $this->setRequest(new HTTP_Request2());
+            $request = new HTTP_Request2();
+            //yes, people redirect xmlrpc.php
+            $request->setConfig('follow_redirects', true);
+            $this->setRequest($request);
         }
         return $this->request;
     }

@@ -351,6 +351,8 @@ XML
             $request = new HTTP_Request2();
             //yes, people redirect xmlrpc.php
             $request->setConfig('follow_redirects', true);
+            //keep POST on redirect
+            $request->setConfig('strict_redirects', true);
             $this->setRequest($request);
         }
         return $this->request;

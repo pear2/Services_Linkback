@@ -17,6 +17,14 @@ function __autoload($class) {
 }
 
 $c = new \PEAR2\Services\Linkback\Client();
+//if you want secure SSL support, you have to configure your own CA list
+$req = $c->getRequest();
+$req->setConfig(
+    array(
+        'ssl_verify_peer' => false,
+        'ssl_verify_host' => false
+    )
+);
 $c->setDebug(true);
 $r = $c->send($source, $target);
 
@@ -28,5 +36,5 @@ if ($r->isError()) {
     echo "All fine\n";
     echo " Debug message: " . $r->getMessage() . "\n";
 }
-//var_dump($r->getResponse()->getBody());
+//var_dump($r->getResponse()->getHeader(), $r->getResponse()->getBody());
 ?>

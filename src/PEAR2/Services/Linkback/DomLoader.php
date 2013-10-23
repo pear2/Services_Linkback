@@ -38,6 +38,9 @@ class DomLoader
     {
         $doc = new \DOMDocument();
 
+        libxml_clear_errors();
+        $old = libxml_use_internal_errors(true);
+
         $typeParts = explode(';', $res->getHeader('content-type'));
         $type = $typeParts[0];
         if ($type == 'application/xhtml+xml'
@@ -48,6 +51,9 @@ class DomLoader
         } else {
             $doc->loadHTML($sourceBody);
         }
+
+        libxml_clear_errors();
+        libxml_use_internal_errors($old);
 
         return $doc;
     }

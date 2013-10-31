@@ -46,64 +46,64 @@
   <dir name="/">
 
    <dir name="examples">
-    <file role="doc" name="test-client.php"/>
+    <file role="doc" name="cli-client.php"/>
+    <file role="doc" name="config.php"/>
     <file role="doc" name="config.php.dist"/>
-    <file role="doc" name="test-server.php"/>
+    <file role="doc" name="page-with-link.php"/>
     <file role="doc" name="page-without-link.htm"/>
     <file role="doc" name="remote-headlinkonly.php"/>
     <file role="doc" name="remote-headeronly.php"/>
+    <file role="doc" name="test-client.php"/>
+    <file role="doc" name="test-server.php"/>
     <file role="doc" name="webhook.php"/>
-    <file role="doc" name="page-with-link.php"/>
-    <file role="doc" name="cli-client.php"/>
-    <file role="doc" name="config.php"/>
    </dir>
 
    <dir name="src">
     <dir name="PEAR2">
      <dir name="Services">
       <dir name="Linkback">
-       <file role="php" name="Client.php" install-as="PEAR2/Services/Linkback/Client.php"/>
-       <file role="php" name="DomLoader.php" install-as="PEAR2/Services/Linkback/DomLoader.php"/>
-       <file role="php" name="Exception.php" install-as="PEAR2/Services/Linkback/Exception.php"/>
-       <file role="php" name="Server.php" install-as="PEAR2/Services/Linkback/Server.php"/>
-       <file role="php" name="States.php" install-as="PEAR2/Services/Linkback/States.php"/>
-       <file role="php" name="Url.php" install-as="PEAR2/Services/Linkback/Url.php"/>
+       <file role="php" name="Client.php"/>
+       <file role="php" name="DomLoader.php"/>
+       <file role="php" name="Exception.php"/>
+       <file role="php" name="Server.php"/>
+       <file role="php" name="States.php"/>
+       <file role="php" name="Url.php"/>
        <dir name="Response">
-        <file role="php" name="Ping.php" install-as="PEAR2/Services/Linkback/Response/Ping.php"/>
+        <file role="php" name="Ping.php"/>
        </dir>
        <dir name="Server">
-        <file role="php" name="Info.php" install-as="PEAR2/Services/Linkback/Server/Info.php"/>
+        <file role="php" name="Info.php"/>
         <dir name="Callback">
-         <file role="php" name="Akismet.php" install-as="PEAR2/Services/Linkback/Server/Callback/Akismet.php"/>
-         <file role="php" name="FetchSource.php" install-as="PEAR2/Services/Linkback/Server/Callback/FetchSource.php"/>
-         <file role="php" name="ITarget.php" install-as="PEAR2/Services/Linkback/Server/Callback/ITarget.php"/>
-         <file role="php" name="ILink.php" install-as="PEAR2/Services/Linkback/Server/Callback/ILink.php"/>
-         <file role="php" name="IStorage.php" install-as="PEAR2/Services/Linkback/Server/Callback/IStorage.php"/>
-         <file role="php" name="ISource.php" install-as="PEAR2/Services/Linkback/Server/Callback/ISource.php"/>
-         <file role="php" name="LinkExists.php" install-as="PEAR2/Services/Linkback/Server/Callback/LinkExists.php"/>
+         <file role="php" name="Akismet.php"/>
+         <file role="php" name="FetchSource.php"/>
+         <file role="php" name="ITarget.php"/>
+         <file role="php" name="ILink.php"/>
+         <file role="php" name="IStorage.php"/>
+         <file role="php" name="ISource.php"/>
+         <file role="php" name="LinkExists.php"/>
          <dir name="Base">
-          <file role="php" name="HTTPRequest.php" install-as="PEAR2/Services/Linkback/Server/Callback/Base/HTTPRequest.php"/>
+          <file role="php" name="HTTPRequest.php"/>
          </dir>
          <dir name="FetchSource">
-          <file role="php" name="Mock.php" install-as="PEAR2/Services/Linkback/Server/Callback/FetchSource/Mock.php"/>
+          <file role="php" name="Mock.php"/>
          </dir>
          <dir name="LinkExists">
-          <file role="php" name="Mock.php" install-as="PEAR2/Services/Linkback/Server/Callback/LinkExists/Mock.php"/>
+          <file role="php" name="Mock.php"/>
          </dir>
          <dir name="StoreLinkback">
-          <file role="php" name="Object.php" install-as="PEAR2/Services/Linkback/Server/Callback/StoreLinkback/Object.php"/>
+          <file role="php" name="Object.php"/>
          </dir>
          <dir name="TargetExists">
-          <file role="php" name="Mock.php" install-as="PEAR2/Services/Linkback/Server/Callback/TargetExists/Mock.php"/>
+          <file role="php" name="Mock.php"/>
          </dir>
         </dir>
         <dir name="Responder">
-         <file role="php" name="Webmention.php" install-as="PEAR2/Services/Linkback/Server/Responder/Webmention.php"/>
-         <file role="php" name="Pingback.php" install-as="PEAR2/Services/Linkback/Server/Responder/Pingback.php"/>
-         <file role="php" name="Base.php" install-as="PEAR2/Services/Linkback/Server/Responder/Base.php"/>
-         <file role="php" name="Mock.php" install-as="PEAR2/Services/Linkback/Server/Responder/Mock.php"/>
+         <file role="php" name="Webmention.php"/>
+         <file role="php" name="Pingback.php"/>
+         <file role="php" name="Base.php"/>
+         <file role="php" name="Mock.php"/>
          <dir name="Webmention">
-          <file role="php" name="Mock.php" install-as="PEAR2/Services/Linkback/Server/Responder/Webmention/Mock.php"/>
+          <file role="php" name="Mock.php"/>
          </dir>
         </dir>
        </dir>
@@ -177,7 +177,55 @@
   </required>
  </dependencies>
 
- <phprelease/>
+ <phprelease>
+  <filelist>
+   <install name="src/PEAR2/Services/Linkback/Url.php" as="PEAR2/Services/Linkback/Url.php"/>
+   <install name="src/PEAR2/Services/Linkback/Server.php" as="PEAR2/Services/Linkback/Server.php"/>
+   <install name="src/PEAR2/Services/Linkback/States.php" as="PEAR2/Services/Linkback/States.php"/>
+   <install name="src/PEAR2/Services/Linkback/Response/Ping.php" as="PEAR2/Services/Linkback/Response/Ping.php"/>
+   <install name="src/PEAR2/Services/Linkback/DomLoader.php" as="PEAR2/Services/Linkback/DomLoader.php"/>
+   <install name="src/PEAR2/Services/Linkback/Server/Info.php" as="PEAR2/Services/Linkback/Server/Info.php"/>
+   <install name="src/PEAR2/Services/Linkback/Server/Callback/LinkExists/Mock.php" as="PEAR2/Services/Linkback/Server/Callback/LinkExists/Mock.php"/>
+   <install name="src/PEAR2/Services/Linkback/Server/Callback/FetchSource.php" as="PEAR2/Services/Linkback/Server/Callback/FetchSource.php"/>
+   <install name="src/PEAR2/Services/Linkback/Server/Callback/Akismet.php" as="PEAR2/Services/Linkback/Server/Callback/Akismet.php"/>
+   <install name="src/PEAR2/Services/Linkback/Server/Callback/TargetExists/Mock.php" as="PEAR2/Services/Linkback/Server/Callback/TargetExists/Mock.php"/>
+   <install name="src/PEAR2/Services/Linkback/Server/Callback/ITarget.php" as="PEAR2/Services/Linkback/Server/Callback/ITarget.php"/>
+   <install name="src/PEAR2/Services/Linkback/Server/Callback/Base/HTTPRequest.php" as="PEAR2/Services/Linkback/Server/Callback/Base/HTTPRequest.php"/>
+   <install name="src/PEAR2/Services/Linkback/Server/Callback/ILink.php" as="PEAR2/Services/Linkback/Server/Callback/ILink.php"/>
+   <install name="src/PEAR2/Services/Linkback/Server/Callback/IStorage.php" as="PEAR2/Services/Linkback/Server/Callback/IStorage.php"/>
+   <install name="src/PEAR2/Services/Linkback/Server/Callback/ISource.php" as="PEAR2/Services/Linkback/Server/Callback/ISource.php"/>
+   <install name="src/PEAR2/Services/Linkback/Server/Callback/StoreLinkback/Object.php" as="PEAR2/Services/Linkback/Server/Callback/StoreLinkback/Object.php"/>
+   <install name="src/PEAR2/Services/Linkback/Server/Callback/FetchSource/Mock.php" as="PEAR2/Services/Linkback/Server/Callback/FetchSource/Mock.php"/>
+   <install name="src/PEAR2/Services/Linkback/Server/Callback/LinkExists.php" as="PEAR2/Services/Linkback/Server/Callback/LinkExists.php"/>
+   <install name="src/PEAR2/Services/Linkback/Server/Responder/Webmention.php" as="PEAR2/Services/Linkback/Server/Responder/Webmention.php"/>
+   <install name="src/PEAR2/Services/Linkback/Server/Responder/Pingback.php" as="PEAR2/Services/Linkback/Server/Responder/Pingback.php"/>
+   <install name="src/PEAR2/Services/Linkback/Server/Responder/Base.php" as="PEAR2/Services/Linkback/Server/Responder/Base.php"/>
+   <install name="src/PEAR2/Services/Linkback/Server/Responder/Webmention/Mock.php" as="PEAR2/Services/Linkback/Server/Responder/Webmention/Mock.php"/>
+   <install name="src/PEAR2/Services/Linkback/Server/Responder/Mock.php" as="PEAR2/Services/Linkback/Server/Responder/Mock.php"/>
+   <install name="src/PEAR2/Services/Linkback/Client.php" as="PEAR2/Services/Linkback/Client.php"/>
+   <install name="src/PEAR2/Services/Linkback/Exception.php" as="PEAR2/Services/Linkback/Exception.php"/>
+
+   <install name="tests/phpunit.xml" as="phpunit.xml"/>
+   <install name="tests/bootstrap.php" as="bootstrap.php"/>
+   <install name="tests/PEAR2/Services/Linkback/DomLoaderTest.php" as="PEAR2/Services/Linkback/DomLoaderTest.php"/>
+   <install name="tests/PEAR2/Services/Linkback/StatesTest.php" as="PEAR2/Services/Linkback/StatesTest.php"/>
+   <install name="tests/PEAR2/Services/Linkback/Response/PingTest.php" as="PEAR2/Services/Linkback/Response/PingTest.php"/>
+   <install name="tests/PEAR2/Services/Linkback/Server/ResponderTest.php" as="PEAR2/Services/Linkback/Server/ResponderTest.php"/>
+   <install name="tests/PEAR2/Services/Linkback/Server/Callback/FetchSourceTest.php" as="PEAR2/Services/Linkback/Server/Callback/FetchSourceTest.php"/>
+   <install name="tests/PEAR2/Services/Linkback/Server/Callback/ISourceTest.php" as="PEAR2/Services/Linkback/Server/Callback/ISourceTest.php"/>
+   <install name="tests/PEAR2/Services/Linkback/Server/Callback/ILinkTest.php" as="PEAR2/Services/Linkback/Server/Callback/ILinkTest.php"/>
+   <install name="tests/PEAR2/Services/Linkback/Server/Callback/LinkExistsTest.php" as="PEAR2/Services/Linkback/Server/Callback/LinkExistsTest.php"/>
+   <install name="tests/PEAR2/Services/Linkback/Server/Callback/Base/HTTPRequestTest.php" as="PEAR2/Services/Linkback/Server/Callback/Base/HTTPRequestTest.php"/>
+   <install name="tests/PEAR2/Services/Linkback/Server/Callback/ITargetTest.php" as="PEAR2/Services/Linkback/Server/Callback/ITargetTest.php"/>
+   <install name="tests/PEAR2/Services/Linkback/Server/Callback/AkismetTest.php" as="PEAR2/Services/Linkback/Server/Callback/AkismetTest.php"/>
+   <install name="tests/PEAR2/Services/Linkback/Server/Callback/IStorageTest.php" as="PEAR2/Services/Linkback/Server/Callback/IStorageTest.php"/>
+   <install name="tests/PEAR2/Services/Linkback/Server/Callback/LocalStaticTargetTest.php" as="PEAR2/Services/Linkback/Server/Callback/LocalStaticTargetTest.php"/>
+   <install name="tests/PEAR2/Services/Linkback/Server/Responder/WebmentionTest.php" as="PEAR2/Services/Linkback/Server/Responder/WebmentionTest.php"/>
+   <install name="tests/PEAR2/Services/Linkback/ExceptionTest.php" as="PEAR2/Services/Linkback/ExceptionTest.php"/>
+   <install name="tests/PEAR2/Services/Linkback/ServerTest.php" as="PEAR2/Services/Linkback/ServerTest.php"/>
+   <install name="tests/PEAR2/Services/Linkback/ClientTest.php" as="PEAR2/Services/Linkback/ClientTest.php"/>
+  </filelist>
+ </phprelease>
 
  <changelog>
 

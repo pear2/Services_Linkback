@@ -393,6 +393,31 @@ HTM;
         );
     }
 
+    public function testDiscoverServerHeadContentTypeParameter()
+    {
+        //HEAD request
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "Content-Type: text/html; charset=UTF-8\r\n",
+            'http://example.org/article'
+        );
+        //GET request
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "Foo: bar\r\n"
+            . "X-Pingback: http://example.org/pingback-server\r\n"
+            . "Bar: foo\r\n",
+            'http://example.org/article'
+        );
+
+        $res = $this->client->discoverServer(
+            'http://example.org/article'
+        );
+        $this->assertInstanceOf('PEAR2\Services\Linkback\Server\Info', $res);
+        $this->assertEquals('http://example.org/pingback-server', $res->uri);
+        $this->assertEquals('pingback', $res->type);
+    }
+
     public function testDiscoverServerTargetUriNotFoundHead()
     {
         $this->mock->addResponse(

@@ -166,7 +166,7 @@ class Client
             return new Server\Info('pingback', $headerUri);
         }
 
-        $type = $res->getHeader('Content-type');
+        list($type) = explode(';', $res->getHeader('Content-type'));
         if ($type != 'text/html' && $type != 'text/xml'
             && $type != 'application/xhtml+xml'
             && $res->getStatus() != 405//method not allowed

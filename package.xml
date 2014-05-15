@@ -167,6 +167,11 @@
     <min>1.1.1</min>
    </package>
    <package>
+    <name>HTTP_Request2</name>
+    <channel>pear.php.net</channel>
+    <min>2.2.1</min>
+   </package>
+   <package>
     <name>Net_URL2</name>
     <channel>pear.php.net</channel>
     <min>1.0.0</min>

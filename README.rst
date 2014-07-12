@@ -30,16 +30,16 @@ The server provides 4 types of callbacks to modify its behaviour.
 Each callback needs to implement one of the four interfaces:
 
 
-Services\Linkback\Server\Callback\ITarget
------------------------------------------
+Services\\Linkback\\Server\\Callback\\ITarget
+---------------------------------------------
 Verifies that the target URL exists in the local system.
 Useful to filter out pingbacks for non-existant URLs.
 
 FIXME: Default implementation
 
 
-Services\Linkback\Server\Callback\ISource
------------------------------------------
+Services\\Linkback\\Server\\Callback\\ISource
+---------------------------------------------
 Fetches the source URL for further verification.
 Used to determine if the source URL really exists.
 
@@ -47,8 +47,8 @@ Services_Pingback provides the ``Services\Linkback\Server\Callback\FetchSource``
 callback class that is automatically registered with the server.
 
 
-Services\Linkback\Server\Callback\ILink
----------------------------------------
+Services\\Linkback\\Server\\Callback\\ILink
+-------------------------------------------
 Verifies that the source URL content really links to the target URL.
 Used to filter out fake pingbacks that do not actually provide links.
 
@@ -56,8 +56,8 @@ Services_Pingback provides the ``Services\Linkback\Server\Callback\LinkExists``
 callback class that is automatically registered with the server.
 
 
-Services\Linkback\Server\Callback\IStorage
-------------------------------------------
+Services\\Linkback\\Server\\Callback\\IStorage
+----------------------------------------------
 After all verifications have been done, the storage finally handles
 the pingback - it could e.g. log it to a file or a database.
 
@@ -70,3 +70,12 @@ TODO
 ----
 See what we can learn from
 http://www.acunetix.com/blog/web-security-zone/wordpress-pingback-vulnerability/
+
+
+============
+Installation
+============
+::
+
+    $ pear channel-discover pear2.php.net
+    $ pear install pear2/pear2_services_linkback-alpha

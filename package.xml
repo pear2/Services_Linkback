@@ -47,7 +47,6 @@
 
    <dir name="examples">
     <file role="doc" name="cli-client.php"/>
-    <file role="doc" name="config.php"/>
     <file role="doc" name="config.php.dist"/>
     <file role="doc" name="page-with-link.php"/>
     <file role="doc" name="page-without-link.htm"/>

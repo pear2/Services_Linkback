@@ -135,35 +135,9 @@ class Client
             );
         }
 
-        //webmention link header
-        $http = new \HTTP2();
-        $links = $http->parseLinks($res->getHeader('Link'));
-        foreach ($links as $link) {
-            if (isset($link['_uri']) && isset($link['rel'])
-                && (array_search('webmention', $link['rel']) !== false
-                || array_search('http://webmention.org/', $link['rel']) !== false)
-            ) {
-                if (!$this->urlValidator->validate($link['_uri'])) {
-                    return new Response\Ping(
-                        'HEAD Link webmention server URI invalid: '
-                        . $link['_uri'],
-                        States::INVALID_URI
-                    );
-                }
-                return new Server\Info('webmention', $link['_uri']);
-            }
-        }
-
-        //pingback url header
-        $headerUri = $res->getHeader('X-Pingback');
-        if ($headerUri !== null) {
-            if (!$this->urlValidator->validate($headerUri)) {
-                return new Response\Ping(
-                    'HEAD X-Pingback server URI invalid: ' . $headerUri,
-                    States::INVALID_URI
-                );
-            }
-            return new Server\Info('pingback', $headerUri);
+        $info = $this->extractHeader($res, 'HEAD');
+        if ($info !== null) {
+            return $info;
         }
 
         list($type) = explode(';', $res->getHeader('Content-type'));
@@ -190,15 +164,11 @@ class Client
         }
 
         //yes, maybe the server does return this header now
-        $headerUri = $res->getHeader('X-Pingback');
-        if ($headerUri !== null) {
-            if (!$this->urlValidator->validate($headerUri)) {
-                return new Response\Ping(
-                    'GET X-Pingback server URI invalid: ' . $headerUri,
-                    States::INVALID_URI
-                );
-            }
-            return new Server\Info('pingback', $headerUri);
+        // e.g. PHP's Phar::webPhar() does not work with HEAD
+        // https://bugs.php.net/bug.php?id=51918
+        $info = $this->extractHeader($res, 'GET');
+        if ($info !== null) {
+            return $info;
         }
 
         $body = $res->getBody();
@@ -256,6 +226,54 @@ class Client
         }
 
         return new Server\Info('pingback', $arLinks['pingback']);
+    }
+
+    /**
+     * Extract webmention and pingback headers from the HTTP response.
+     * Create server info object if found
+     *
+     * @param \HTTP_Request2_Response $res    HTTP response from the target
+     * @param string                  $method HTTP method used to fetch $res
+     *
+     * @return Server\Info|Response\Ping Information about linkback endpoint
+     *                                   or error information
+     *                                   or NULL if no link found
+     */
+    protected function extractHeader($res, $method = 'GET')
+    {
+        $http = new \HTTP2();
+
+        //webmention link header
+        $links = $http->parseLinks($res->getHeader('Link'));
+        foreach ($links as $link) {
+            if (isset($link['_uri']) && isset($link['rel'])
+                && (array_search('webmention', $link['rel']) !== false
+                || array_search('http://webmention.org/', $link['rel']) !== false)
+            ) {
+                if (!$this->urlValidator->validate($link['_uri'])) {
+                    return new Response\Ping(
+                        $method . ' Link webmention server URI invalid: '
+                        . $link['_uri'],
+                        States::INVALID_URI
+                    );
+                }
+                return new Server\Info('webmention', $link['_uri']);
+            }
+        }
+
+        //pingback url header
+        $headerUri = $res->getHeader('X-Pingback');
+        if ($headerUri !== null) {
+            if (!$this->urlValidator->validate($headerUri)) {
+                return new Response\Ping(
+                    $method . ' X-Pingback server URI invalid: ' . $headerUri,
+                    States::INVALID_URI
+                );
+            }
+            return new Server\Info('pingback', $headerUri);
+        }
+
+        return null;
     }
 
     /**

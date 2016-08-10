@@ -135,7 +135,8 @@ class Client
             );
         }
 
-        $info = $this->extractHeader($res, 'HEAD');
+        $uTarget = new \Net_URL2($targetUri);
+        $info = $this->extractHeader($res, 'HEAD', $uTarget);
         if ($info !== null) {
             return $info;
         }
@@ -166,7 +167,7 @@ class Client
         //yes, maybe the server does return this header now
         // e.g. PHP's Phar::webPhar() does not work with HEAD
         // https://bugs.php.net/bug.php?id=51918
-        $info = $this->extractHeader($res, 'GET');
+        $info = $this->extractHeader($res, 'GET', $uTarget);
         if ($info !== null) {
             return $info;
         }
@@ -178,13 +179,25 @@ class Client
         $xpath->registerNamespace('h', 'http://www.w3.org/1999/xhtml');
 
         $nodeList = $xpath->query(
-            '/*[self::html or self::h:html]'
-            . '/*[self::head or self::h:head]'
-            . '/*[(self::link or self::h:link)'
+            // <link> with rel=pingback|webmention is "body-ok" in HTML5
+            // https://html.spec.whatwg.org/multipage/semantics.html#body-ok
+            '//*[(self::link or self::h:link)'
+            . ' and @href'
             . ' and ('
             . ' contains(concat(" ", normalize-space(@rel), " "), " webmention ")'
             . ' or contains(concat(" ", normalize-space(@rel), " "), " http://webmention.org/ ")'
             . ' or @rel="pingback"'
+            . ')'
+            . ']'
+            // <a>
+            . ' | '
+            . '/*[self::html or self::h:html]'
+            . '/*[self::body or self::h:body]'
+            . '//*[(self::a or self::h:a)'
+            . ' and @href'
+            . ' and ('
+            . ' contains(concat(" ", normalize-space(@rel), " "), " webmention ")'
+            . ' or contains(concat(" ", normalize-space(@rel), " "), " http://webmention.org/ ")'
             . ')'
             . ']'
         );
@@ -206,10 +219,18 @@ class Client
             if (array_search('http://webmention.org/', $types) !== false) {
                 $types[] = 'webmention';
             }
+            if (array_search('webmention', $types) !== false
+                && $this->urlValidator->relative($uri)
+            ) {
+                //webmention spec allows relative URLs, pingback not
+                $uri = (string) $uTarget->resolve($uri);
+            }
             if ($this->urlValidator->validate($uri)) {
                 foreach ($types as $type) {
                     if ($type == 'webmention' || $type == 'pingback') {
-                        $arLinks[$type] = $uri;
+                        if (!isset($arLinks[$type])) {
+                            $arLinks[$type] = $uri;
+                        }
                     }
                 }
             }
@@ -234,12 +255,13 @@ class Client
      *
      * @param \HTTP_Request2_Response $res    HTTP response from the target
      * @param string                  $method HTTP method used to fetch $res
+     * @param \Net_URL2               $url    Base URL to resolve relative links
      *
      * @return Server\Info|Response\Ping Information about linkback endpoint
      *                                   or error information
      *                                   or NULL if no link found
      */
-    protected function extractHeader($res, $method = 'GET')
+    protected function extractHeader($res, $method, \Net_URL2 $url)
     {
         $http = new \HTTP2();
 
@@ -250,6 +272,10 @@ class Client
                 && (array_search('webmention', $link['rel']) !== false
                 || array_search('http://webmention.org/', $link['rel']) !== false)
             ) {
+                if ($this->urlValidator->relative($link['_uri'])) {
+                    //relative URL
+                    $link['_uri'] = (string) $url->resolve($link['_uri']);
+                }
                 if (!$this->urlValidator->validate($link['_uri'])) {
                     return new Response\Ping(
                         $method . ' Link webmention server URI invalid: '
@@ -262,6 +288,7 @@ class Client
         }
 
         //pingback url header
+        //pingback 1.0 spec does not allow relative links
         $headerUri = $res->getHeader('X-Pingback');
         if ($headerUri !== null) {
             if (!$this->urlValidator->validate($headerUri)) {
@@ -298,7 +325,7 @@ class Client
             ->setMethod(HTTP_Request2::METHOD_POST)
             ->setHeader('Content-type: text/xml')
             ->setBody(
-<<<XML
+                <<<XML
 <?xml version="1.0" encoding="utf-8"?>
 <methodCall>
  <methodName>pingback.ping</methodName>

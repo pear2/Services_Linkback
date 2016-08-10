@@ -39,10 +39,24 @@ class Url
         $urlObj = new \Net_URL2($url);
         if (!$urlObj->isAbsolute()
             || !in_array(strtolower($urlObj->getScheme()), array('https', 'http'))
+            || $urlObj->getHost() == ''
         ) {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Check if an URL is relative
+     *
+     * @param string $url URL string to check
+     *
+     * @return boolean True if the URL is relative (no host)
+     */
+    public function relative($url)
+    {
+        $host = parse_url($url, PHP_URL_HOST);
+        return $host === null;
     }
 }
 ?>

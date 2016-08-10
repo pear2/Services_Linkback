@@ -62,6 +62,18 @@ HTM;
 </html>
 HTM;
 
+    protected static $htmlWithWebmentionRelative = <<<HTM
+<html>
+ <head>
+  <title>article</title>
+  <link rel="webmention" href="/article-webmention-server" />
+ </head>
+ <body>
+  <p>This is an article</p>
+ </body>
+</html>
+HTM;
+
     protected static $htmlWithWebmentionNo = <<<HTM
 <html>
  <head>
@@ -327,7 +339,7 @@ HTM;
         $this->assertEquals('webmention', $res->type);
     }
 
-    public function testDiscoverServerHeadWebmentionInvalid()
+    public function testDiscoverServerHeadWebmentionRelative()
     {
         //HEAD request
         $this->mock->addResponse(
@@ -341,11 +353,30 @@ HTM;
         $res = $this->client->discoverServer(
             'http://example.org/article'
         );
+        $this->assertInstanceOf('PEAR2\Services\Linkback\Server\Info', $res);
+        $this->assertEquals('http://example.org/webmention-server', $res->uri);
+        $this->assertEquals('webmention', $res->type);
+    }
+
+    public function testDiscoverServerHeadWebmentionInvalid()
+    {
+        //HEAD request
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "Foo: bar\r\n"
+            . "Link: <http:///>; rel=\"webmention\"\r\n"
+            . "Bar: foo\r\n",
+            'http://example.org/article'
+        );
+
+        $res = $this->client->discoverServer(
+            'http://example.org/article'
+        );
         $this->assertInstanceOf('\PEAR2\Services\Linkback\Response\Ping', $res);
         $this->assertTrue($res->isError());
         $this->assertEquals(States::INVALID_URI, $res->getCode());
         $this->assertEquals(
-            'HEAD Link webmention server URI invalid: /webmention-server',
+            'HEAD Link webmention server URI invalid: http:///',
             $res->getMessage()
         );
     }
@@ -553,6 +584,28 @@ HTM;
             "HTTP/1.0 200 OK\r\n"
             . "\r\n"
             . static::$htmlWithWebmentionOrg,
+            'http://example.org/article'
+        );
+
+        $res = $this->client->discoverServer(
+            'http://example.org/article'
+        );
+        $this->assertInstanceOf('PEAR2\Services\Linkback\Server\Info', $res);
+        $this->assertEquals('http://example.org/article-webmention-server', $res->uri);
+        $this->assertEquals('webmention', $res->type);
+    }
+
+    public function testDiscoverServerHtmlWebmentionRelative()
+    {
+        //HEAD request
+        $this->mock->addResponse(
+            "HTTP/1.0 405 Method not allowed\r\n", 'http://example.org/article'
+        );
+        //GET
+        $this->mock->addResponse(
+            "HTTP/1.0 200 OK\r\n"
+            . "\r\n"
+            . static::$htmlWithWebmentionRelative,
             'http://example.org/article'
         );
 

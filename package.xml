@@ -22,11 +22,11 @@
   <email>cweiske@php.net</email>
   <active>yes</active>
  </lead>
- <date>2014-07-12</date>
- <time>13:57:42</time>
+ <date>2016-08-10</date>
+ <time>21:22:42</time>
  <version>
-  <release>0.2.1</release>
-  <api>0.2.0</api>
+  <release>0.3.0</release>
+  <api>0.3.0</api>
  </version>
  <stability>
   <release>alpha</release>
@@ -35,7 +35,10 @@
  <license uri="http://www.gnu.org/licenses/lgpl.html">LGPL</license>
 
  <notes>
-  - Fetch webmention header on GET requests, too
+  - Support relative webmention endpoint links
+  - Passes all https://webmention.rocks/ tests
+  - Fix coding standard errors
+  - Automatically test on travis-ci.org
  </notes>
 
  <contents>
@@ -114,10 +117,9 @@
      <dir name="Services">
       <dir name="Linkback">
        <file role="test" name="ClientTest.php"/>
+       <file role="test" name="ClientOnlineTest.php"/>
        <file role="test" name="DomLoaderTest.php"/>
-       <file role="test" name="ExceptionTest.php"/>
        <file role="test" name="ServerTest.php"/>
-       <file role="test" name="StatesTest.php"/>
        <dir name="Response">
         <file role="test" name="PingTest.php"/>
        </dir>
@@ -125,13 +127,7 @@
         <file role="test" name="ResponderTest.php"/>
         <dir name="Callback">
          <file role="test" name="FetchSourceTest.php"/>
-         <file role="test" name="ISourceTest.php"/>
-         <file role="test" name="ILinkTest.php"/>
          <file role="test" name="LinkExistsTest.php"/>
-         <file role="test" name="ITargetTest.php"/>
-         <file role="test" name="AkismetTest.php"/>
-         <file role="test" name="IStorageTest.php"/>
-         <file role="test" name="LocalStaticTargetTest.php"/>
          <dir name="Base">
           <file role="test" name="HTTPRequestTest.php"/>
          </dir>
@@ -151,7 +147,7 @@
  <dependencies>
   <required>
    <php>
-    <min>5.2.0</min>
+    <min>5.4.0</min>
    </php>
    <pearinstaller>
     <min>1.9.4</min>
@@ -164,12 +160,12 @@
    <package>
     <name>HTTP_Request2</name>
     <channel>pear.php.net</channel>
-    <min>2.2.1</min>
+    <min>2.3.0</min>
    </package>
    <package>
     <name>Net_URL2</name>
     <channel>pear.php.net</channel>
-    <min>1.0.0</min>
+    <min>2.2.0</min>
    </package>
    <extension>
     <name>xmlrpc</name>
@@ -208,22 +204,15 @@
    <install name="tests/phpunit.xml" as="phpunit.xml"/>
    <install name="tests/bootstrap.php" as="bootstrap.php"/>
    <install name="tests/PEAR2/Services/Linkback/DomLoaderTest.php" as="PEAR2/Services/Linkback/DomLoaderTest.php"/>
-   <install name="tests/PEAR2/Services/Linkback/StatesTest.php" as="PEAR2/Services/Linkback/StatesTest.php"/>
    <install name="tests/PEAR2/Services/Linkback/Response/PingTest.php" as="PEAR2/Services/Linkback/Response/PingTest.php"/>
    <install name="tests/PEAR2/Services/Linkback/Server/ResponderTest.php" as="PEAR2/Services/Linkback/Server/ResponderTest.php"/>
    <install name="tests/PEAR2/Services/Linkback/Server/Callback/FetchSourceTest.php" as="PEAR2/Services/Linkback/Server/Callback/FetchSourceTest.php"/>
-   <install name="tests/PEAR2/Services/Linkback/Server/Callback/ISourceTest.php" as="PEAR2/Services/Linkback/Server/Callback/ISourceTest.php"/>
-   <install name="tests/PEAR2/Services/Linkback/Server/Callback/ILinkTest.php" as="PEAR2/Services/Linkback/Server/Callback/ILinkTest.php"/>
    <install name="tests/PEAR2/Services/Linkback/Server/Callback/LinkExistsTest.php" as="PEAR2/Services/Linkback/Server/Callback/LinkExistsTest.php"/>
    <install name="tests/PEAR2/Services/Linkback/Server/Callback/Base/HTTPRequestTest.php" as="PEAR2/Services/Linkback/Server/Callback/Base/HTTPRequestTest.php"/>
-   <install name="tests/PEAR2/Services/Linkback/Server/Callback/ITargetTest.php" as="PEAR2/Services/Linkback/Server/Callback/ITargetTest.php"/>
-   <install name="tests/PEAR2/Services/Linkback/Server/Callback/AkismetTest.php" as="PEAR2/Services/Linkback/Server/Callback/AkismetTest.php"/>
-   <install name="tests/PEAR2/Services/Linkback/Server/Callback/IStorageTest.php" as="PEAR2/Services/Linkback/Server/Callback/IStorageTest.php"/>
-   <install name="tests/PEAR2/Services/Linkback/Server/Callback/LocalStaticTargetTest.php" as="PEAR2/Services/Linkback/Server/Callback/LocalStaticTargetTest.php"/>
    <install name="tests/PEAR2/Services/Linkback/Server/Responder/WebmentionTest.php" as="PEAR2/Services/Linkback/Server/Responder/WebmentionTest.php"/>
-   <install name="tests/PEAR2/Services/Linkback/ExceptionTest.php" as="PEAR2/Services/Linkback/ExceptionTest.php"/>
    <install name="tests/PEAR2/Services/Linkback/ServerTest.php" as="PEAR2/Services/Linkback/ServerTest.php"/>
    <install name="tests/PEAR2/Services/Linkback/ClientTest.php" as="PEAR2/Services/Linkback/ClientTest.php"/>
+   <install name="tests/PEAR2/Services/Linkback/ClientOnlineTest.php" as="PEAR2/Services/Linkback/ClientOnlineTest.php"/>
   </filelist>
  </phprelease>
 

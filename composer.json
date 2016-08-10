@@ -17,15 +17,13 @@
     "autoload": {
         "psr-0": {"PEAR2\\Services\\Linkback\\": "src"}
     },
-    "repositories": [
-        {
-            "type": "pear",
-            "url": "pear.php.net"
-        }
-    ],
     "require": {
-        "pear-pear.php.net/HTTP2": "~1.1",
-        "pear-pear.php.net/HTTP_Request2": "~2.2",
-        "pear-pear.php.net/Net_URL2": "~2.0"
+        "pear/http2": "~1.1",
+        "pear/http_request2": "~2.2",
+        "pear/net_url2": "~2.2"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "~2.6",
+        "phpunit/phpunit": "*"
     }
 }

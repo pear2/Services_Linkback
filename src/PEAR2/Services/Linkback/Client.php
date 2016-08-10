@@ -27,6 +27,7 @@ class Client
 {
     /**
      * HTTP request object that's used to do the requests
+     *
      * @var HTTP_Request2
      */
     protected $request;
@@ -178,14 +179,15 @@ class Client
         $xpath = new \DOMXPath($doc);
         $xpath->registerNamespace('h', 'http://www.w3.org/1999/xhtml');
 
+        $xpRel = 'concat(" ", normalize-space(@rel), " ")';
         $nodeList = $xpath->query(
             // <link> with rel=pingback|webmention is "body-ok" in HTML5
             // https://html.spec.whatwg.org/multipage/semantics.html#body-ok
             '//*[(self::link or self::h:link)'
             . ' and @href'
             . ' and ('
-            . ' contains(concat(" ", normalize-space(@rel), " "), " webmention ")'
-            . ' or contains(concat(" ", normalize-space(@rel), " "), " http://webmention.org/ ")'
+            . ' contains(' . $xpRel . ', " webmention ")'
+            . ' or contains(' . $xpRel . ', " http://webmention.org/ ")'
             . ' or @rel="pingback"'
             . ')'
             . ']'
@@ -196,8 +198,8 @@ class Client
             . '//*[(self::a or self::h:a)'
             . ' and @href'
             . ' and ('
-            . ' contains(concat(" ", normalize-space(@rel), " "), " webmention ")'
-            . ' or contains(concat(" ", normalize-space(@rel), " "), " http://webmention.org/ ")'
+            . ' contains(' . $xpRel . ', " webmention ")'
+            . ' or contains(' . $xpRel . ', " http://webmention.org/ ")'
             . ')'
             . ']'
         );

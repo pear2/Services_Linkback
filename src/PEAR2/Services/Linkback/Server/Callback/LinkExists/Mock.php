@@ -25,6 +25,8 @@ namespace PEAR2\Services\Linkback\Server\Callback\LinkExists;
 class Mock implements \PEAR2\Services\Linkback\Server\Callback\ILink
 {
     /**
+     * If the link shall exist
+     *
      * @var boolean
      */
     protected $linkExists = false;

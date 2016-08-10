@@ -40,7 +40,7 @@ class Mock extends Pingback
     /**
      * Stores the xml response
      *
-     * @param string $xml XML response to send
+     * @param string $content XML response to send
      *
      * @return void
      */

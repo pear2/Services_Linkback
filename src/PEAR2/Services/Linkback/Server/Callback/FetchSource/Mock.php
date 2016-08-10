@@ -25,6 +25,8 @@ class Mock extends \PEAR2\Services\Linkback\Server\Callback\Base\HTTPRequest
     implements \PEAR2\Services\Linkback\Server\Callback\ISource
 {
     /**
+     * Mocked HTTP response
+     *
      * @var \HTTP_Request2_Response
      */
     protected $res;

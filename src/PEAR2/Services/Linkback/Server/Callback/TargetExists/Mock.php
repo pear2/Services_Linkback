@@ -25,11 +25,15 @@ namespace PEAR2\Services\Linkback\Server\Callback\TargetExists;
 class Mock implements \PEAR2\Services\Linkback\Server\Callback\ITarget
 {
     /**
+     * If the target should exist or not
+     *
      * @var boolean
      */
     protected $targetExists = true;
 
     /**
+     * Exception to throw when verifyTargetExists() is called
+     *
      * @var \Exception
      */
     protected $exception;

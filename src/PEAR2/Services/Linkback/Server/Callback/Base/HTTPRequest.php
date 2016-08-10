@@ -25,6 +25,7 @@ abstract class HTTPRequest
 {
     /**
      * HTTP request object that's used to do the requests
+     *
      * @var HTTP_Request2
      */
     protected $request;

@@ -145,3 +145,8 @@ Packagist
   https://packagist.org/packages/pear2/services_linkback
 
 __ https://github.com/pear2/Services_Linkback/tree/master/examples
+Unit test status
+  https://travis-ci.org/pear2/Services_Linkback
+
+  .. image:: https://travis-ci.org/pear2/Services_Linkback.svg?branch=master
+     :target: https://travis-ci.org/pear2/Services_Linkback

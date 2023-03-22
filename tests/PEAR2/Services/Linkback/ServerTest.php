@@ -294,7 +294,7 @@ XML
         $mockSource->setResponse($httpRes);
         $mockLinkExists = new Server\Callback\LinkExists\Mock();
         $mockLinkExists->setLinkExists(true);
-        $storage = new Server\Callback\StoreLinkback\Object();
+        $storage = new Server\Callback\StoreLinkback\LbObject();
         $this->server->setCallbacks(array($mockSource, $mockLinkExists, $storage));
 
         $res = $this->server->handlePingbackPing(

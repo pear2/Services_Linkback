@@ -22,7 +22,7 @@ use PEAR2\Services\Linkback\Server\Callback as SPbC;
  * @license  http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link     http://pear2.php.net/package/Services_Linkback
  */
-class Object implements SPbC\IStorage
+class LbObject implements SPbC\IStorage
 {
     public $target;
     public $source;

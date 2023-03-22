@@ -1,7 +1,7 @@
 <?php
 namespace PEAR2\Services\Linkback\Server\Callback;
 
-class LinkExistsTest extends \PHPUnit_Framework_TestCase
+class LinkExistsTest extends \PHPUnit\Framework\TestCase
 {
     public function testVerifyLinkExists()
     {

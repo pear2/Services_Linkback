@@ -1,7 +1,7 @@
 <?php
 namespace PEAR2\Services\Linkback\Server\Callback;
 
-class FetchSourceTest extends \PHPUnit_Framework_TestCase
+class FetchSourceTest extends \PHPUnit\Framework\TestCase
 {
     public function testFetchSource()
     {
@@ -19,7 +19,7 @@ class FetchSourceTest extends \PHPUnit_Framework_TestCase
         $fsc = new FetchSource();
         $fsc->setRequest($req);
 
-        $res = $fsc->fetchSource('http://www.example.org/'); 
+        $res = $fsc->fetchSource('http://www.example.org/');
         $this->assertInstanceOf('\HTTP_Request2_Response', $res);
         $this->assertEquals('This is a string', $res->getBody());
     }

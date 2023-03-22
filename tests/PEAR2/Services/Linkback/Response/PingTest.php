@@ -2,7 +2,7 @@
 namespace PEAR2\Services\Linkback\Response;
 use PEAR2\Services\Linkback\States;
 
-class PingTest extends \PHPUnit_Framework_TestCase
+class PingTest extends \PHPUnit\Framework\TestCase
 {
     protected static $xmlOk = <<<XML
 <?xml version="1.0" encoding="utf-8"?>
@@ -67,7 +67,7 @@ JSN;
 
 
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->res = new Ping();
     }

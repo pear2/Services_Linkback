@@ -1,9 +1,9 @@
 <?php
 namespace PEAR2\Services\Linkback;
 
-class DomLoaderTest extends \PHPUnit_Framework_TestCase
+class DomLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->dl = new DomLoader();

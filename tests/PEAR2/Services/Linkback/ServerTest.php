@@ -1,19 +1,19 @@
 <?php
 namespace PEAR2\Services\Linkback;
 
-class ServerTest extends \PHPUnit_Framework_TestCase
+class ServerTest extends \PHPUnit\Framework\TestCase
 {
     protected $server;
     protected $streamVarRegistered = false;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->server = new Server();
         $this->server->setPingbackResponder(new Server\Responder\Mock());
         $this->server->setWebmentionResponder(new Server\Responder\Webmention\Mock());
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         if ($this->streamVarRegistered) {
             stream_wrapper_unregister('var');
@@ -46,11 +46,11 @@ XML
         );
         $this->server->setInputFile('var://GLOBALS/unittest-xml');
         $this->server->run();
-        $this->assertContains(
+        $this->assertStringContainsString(
             'faultCode',
             $this->server->getPingbackResponder()->content
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             '2 parameters required',
             $this->server->getPingbackResponder()->content
         );
@@ -75,11 +75,11 @@ XML
         );
         $this->server->setInputFile('var://GLOBALS/unittest-xml');
         $this->server->run();
-        $this->assertContains(
+        $this->assertStringContainsString(
             'faultCode',
             $this->server->getPingbackResponder()->content
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             'method not found',
             $this->server->getPingbackResponder()->content
         );
@@ -196,7 +196,7 @@ XML
             'pingback.ping',
             array('/path/to/source', 'http://127.0.0.1/target')
         );
-        $this->assertInternalType('array', $res);
+        $this->assertIsArray($res);
         $this->assertEquals(States::INVALID_URI, $res['faultCode']);
         $this->assertEquals(
             'Source URI invalid (not absolute, not http/https)',
@@ -210,7 +210,7 @@ XML
             'pingback.ping',
             array('http://127.0.0.1/source', '/path/to/target')
         );
-        $this->assertInternalType('array', $res);
+        $this->assertIsArray($res);
         $this->assertEquals(States::INVALID_URI, $res['faultCode']);
         $this->assertEquals(
             'Target URI invalid (not absolute, not http/https)',
@@ -228,7 +228,7 @@ XML
             'pingback.ping',
             array('http://127.0.0.1/source', 'http://127.0.0.1/target')
         );
-        $this->assertInternalType('array', $res);
+        $this->assertIsArray($res);
         $this->assertEquals(States::TARGET_URI_NOT_FOUND, $res['faultCode']);
         $this->assertEquals('Target URI does not exist', $res['faultString']);
     }
@@ -243,7 +243,7 @@ XML
             'pingback.ping',
             array('http://127.0.0.1/source', 'http://127.0.0.1/target')
         );
-        $this->assertInternalType('array', $res);
+        $this->assertIsArray($res);
         $this->assertEquals(States::SOURCE_NOT_LOADED, $res['faultCode']);
         $this->assertEquals('Source document not loaded', $res['faultString']);
     }
@@ -260,7 +260,7 @@ XML
             'pingback.ping',
             array('http://127.0.0.1/source', 'http://127.0.0.1/target')
         );
-        $this->assertInternalType('array', $res);
+        $this->assertIsArray($res);
         $this->assertEquals(States::SOURCE_URI_NOT_FOUND, $res['faultCode']);
         $this->assertEquals('Source URI does not exist', $res['faultString']);
     }
@@ -271,14 +271,14 @@ XML
         $mockSource->setResponse(
             new \HTTP_Request2_Response('HTTP/1.0 200 OK')
         );
-        $mockStorage = 
+        $mockStorage =
         $this->server->setCallbacks(array($mockSource));
 
         $res = $this->server->handlePingbackPing(
             'pingback.ping',
             array('http://127.0.0.1/source', 'http://127.0.0.1/target')
         );
-        $this->assertInternalType('array', $res);
+        $this->assertIsArray($res);
         $this->assertEquals(States::NO_LINK_IN_SOURCE, $res['faultCode']);
         $this->assertEquals(
             'Source URI does not contain a link to the target URI,'
@@ -301,7 +301,7 @@ XML
             'pingback.ping',
             array('http://127.0.0.1/source', 'http://127.0.0.1/target')
         );
-        $this->assertInternalType('string', $res);
+        $this->assertIsString($res);
         $this->assertEquals(
             'Pingback received and processed',
             $res
@@ -321,18 +321,16 @@ XML
             'pingback.ping',
             array('http://127.0.0.1/source', 'http://127.0.0.1/target')
         );
-        $this->assertInternalType('array', $res);
+        $this->assertIsArray($res);
         $this->assertEquals(12345, $res['faultCode']);
         $this->assertEquals('This is an exception', $res['faultString']);
     }
 
-    /**
-     * @expectedException Exception
-     * @expectedExceptionMessage Callback object needs to implement one of the linkback server callback interfaces
-     * @expectedExceptionCode 150
-     */
     public function testVerifyCallbacksThrowsException()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Callback object needs to implement one of the linkback server callback interfaces');
+        $this->expectExceptionCode(150);
         $this->server->verifyCallbacks(array(new \stdClass()));
     }
 

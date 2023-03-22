@@ -1,7 +1,7 @@
 <?php
 namespace PEAR2\Services\Linkback\Server;
 
-class ResponderTest extends \PHPUnit_Framework_TestCase
+class ResponderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * separate process is needed for headers

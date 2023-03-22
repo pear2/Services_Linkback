@@ -1,5 +1,7 @@
 examples/test-server-pingback.log
 examples/config.php
+/composer.lock
 /releases/
 /dist/
 /README.html
+/vendor/

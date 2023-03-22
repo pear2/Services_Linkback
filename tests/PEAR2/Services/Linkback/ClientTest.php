@@ -1,7 +1,7 @@
 <?php
 namespace PEAR2\Services\Linkback;
 
-class ClientTest extends \PHPUnit_Framework_TestCase
+class ClientTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \HTTP_Request2_Adapter_Mock
@@ -123,7 +123,7 @@ HTM;
 
 
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->mock = new \HTTP_Request2_Adapter_Mock();
         $req = new \HTTP_Request2();

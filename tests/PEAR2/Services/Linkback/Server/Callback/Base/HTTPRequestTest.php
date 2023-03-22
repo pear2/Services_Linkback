@@ -1,7 +1,7 @@
 <?php
 namespace PEAR2\Services\Linkback\Server\Callback\Base;
 
-class BaseTest extends \PHPUnit_Framework_TestCase
+class HTTPRequestTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetRequestNull()
     {

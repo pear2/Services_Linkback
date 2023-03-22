@@ -5,14 +5,14 @@ namespace PEAR2\Services\Linkback;
  * @group online
  * @large
  */
-class ClientOnlineTest extends \PHPUnit_Framework_TestCase
+class ClientOnlineTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Client
      */
     protected $client;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->client = new Client();
         $req = $this->client->getRequest();

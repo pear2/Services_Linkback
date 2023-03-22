@@ -1,16 +1,16 @@
 <?php
 namespace PEAR2\Services\Linkback\Server\Responder;
 
-class WebmentionTest extends \PHPUnit_Framework_TestCase
+class WebmentionTest extends \PHPUnit\Framework\TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         unset($_SERVER['HTTP_ACCEPT']);
         $this->responder = new Webmention\Mock();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($_SERVER['HTTP_ACCEPT']);
     }
@@ -26,7 +26,7 @@ class WebmentionTest extends \PHPUnit_Framework_TestCase
             'Content-type: text/plain; charset=utf-8',
             $this->responder->header
         );
-        $this->assertContains('All fine', $this->responder->content);
+        $this->assertStringContainsString('All fine', $this->responder->content);
     }
 
     public function testSendHtml()
@@ -42,7 +42,7 @@ class WebmentionTest extends \PHPUnit_Framework_TestCase
             'Content-type: application/xhtml+xml; charset=utf-8',
             $this->responder->header
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Pingback received and processed',
             $this->responder->content
         );
@@ -63,11 +63,11 @@ class WebmentionTest extends \PHPUnit_Framework_TestCase
             'Content-type: text/html; charset=utf-8',
             $this->responder->header
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Webmention: target not found',
             $this->responder->content
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             'nope',
             $this->responder->content
         );

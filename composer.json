@@ -18,12 +18,14 @@
         "psr-0": {"PEAR2\\Services\\Linkback\\": "src"}
     },
     "require": {
-        "pear/http2": "~1.1",
-        "pear/http_request2": "~2.2",
-        "pear/net_url2": "~2.2"
+        "ext-xmlrpc": "*",
+        "pear/http2": "^2.0",
+        "pear/http_request2": "^2.5",
+        "pear/net_url2": "^2.2"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "~2.6",
-        "phpunit/phpunit": "*"
+        "phpunit/phpunit": "^9",
+        "pear/stream_var": "^2.0"
     }
 }

@@ -117,11 +117,6 @@ This setting stores HTTP responses for later inspection.
 ============
 Installation
 ============
-With PEAR::
-
-    $ pear channel-discover pear2.php.net
-    $ pear install pear2/pear2_services_linkback-alpha
-
 Using composer::
 
     $ composer require pear2/services_linkback
